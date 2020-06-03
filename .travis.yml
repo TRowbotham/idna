@@ -1,0 +1,42 @@
+language: php
+
+php:
+  - 7.1
+  - 7.2
+  - 7.3
+  - 7.4
+  - nightly
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+jobs:
+  allow_failures:
+    - php: nightly
+  fast_finish: true
+
+before_install:
+  - composer self-update
+
+install:
+  - if [ $TRAVIS_PHP_VERSION = '7.1' ]; then pecl install pcov; fi
+  - |
+    if [ $TRAVIS_PHP_VERSION = 'nightly' ]; then
+      composer update --ignore-platform-reqs;
+    else
+      composer update;
+    fi
+  - if vendor/bin/phpunit --version | grep -q 'PHPUnit 7'; then composer require --dev pcov/clobber; fi
+
+before_script:
+  - if php -v | grep -q 'Xdebug'; then phpenv config-rm xdebug.ini; fi
+  - if vendor/bin/phpunit --version | grep -q 'PHPUnit 7'; then vendor/bin/pcov clobber; fi
+
+script:
+  - vendor/bin/phpcs
+  - vendor/bin/phpstan analyse
+  - vendor/bin/phpunit
+
+after_success:
+  - if [ $TRAVIS_PHP_VERSION = '7.1' ]; then bash <(curl -s https://codecov.io/bash) || echo 'Codecov failed to upload'; fi
