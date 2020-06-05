@@ -55,11 +55,6 @@ class Label
         return $this->label === '';
     }
 
-    public function isTooLong(): bool
-    {
-        return strlen($this->label) > self::MAX_LABEL_SIZE;
-    }
-
     public function isValidContextJ(CodePointString $label): bool
     {
         $offset = 0;
