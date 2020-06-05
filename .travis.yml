@@ -34,6 +34,7 @@ install:
 before_script:
   - if php -v | grep -q 'Xdebug'; then phpenv config-rm xdebug.ini; fi
   - if vendor/bin/phpunit --version | grep -q 'PHPUnit 7'; then vendor/bin/pcov clobber; fi
+  - php --ri intl || echo 'ext-intl not installed'
 
 script:
   - vendor/bin/phpcs
