@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Rowbot\Idna;
 
-use Normalizer;
 use Rowbot\Idna\CodePointString;
 use Rowbot\Idna\Resource\Regex;
-use Rowbot\Punycode\CodePoint;
 
 use function preg_match;
 use function strlen;
@@ -78,7 +76,7 @@ class Label
             }
 
             // If Canonical_Combining_Class(Before(cp)) .eq. Virama Then True;
-            if (preg_match(Regex::VIRAMA, CodePoint::encode($prev)) === 1) {
+            if (CodePoint::getCombiningClass($prev) === CodePoint::COMBINING_CLASS_VIRAMA) {
                 continue;
             }
 
@@ -129,13 +127,12 @@ class Label
             return;
         }
 
+        $label = new CodePointString($this->label);
+
         // Step 1. The label must be in Unicode Normalization Form C.
-        if (!Normalizer::isNormalized($this->label, Normalizer::FORM_C)) {
-            // What error should be recorded here?
+        if (!$label->isNormalized()) {
             $domain->addError(Idna::ERROR_INVALID_ACE_LABEL);
         }
-
-        $label = new CodePointString($this->label);
 
         if ($options['CheckHyphens']) {
             // Step 2. If CheckHyphens, the label must not contain a U+002D HYPHEN-MINUS character

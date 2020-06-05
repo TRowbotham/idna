@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Rowbot\Idna;
 
-use Normalizer;
 use Rowbot\Idna\Exception\MappingException;
 use Rowbot\Punycode\CodePoint;
-use Rowbot\Punycode\CodePointString;
 
 use function explode;
 use function sprintf;
@@ -99,12 +97,9 @@ class Utf8String
 
     public function normalize(): self
     {
-        if (Normalizer::isNormalized($this->string, Normalizer::FORM_C)) {
-            return $this;
-        }
-
+        $str = new CodePointString($this->string);
         $copy = clone $this;
-        $copy->string = Normalizer::normalize($this->string, Normalizer::FORM_C);
+        $copy->string = $str->maybeNormalize();
 
         return $copy;
     }

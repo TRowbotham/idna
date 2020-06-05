@@ -73,8 +73,32 @@ $allExcept = static function (string ...$filters): Closure {
     };
 };
 
+$normalizationNfcProps = $parser->parse('DerivedNormalizationProps.txt');
+
+$iter = $normalizationNfcProps->filter($only('NFC_QC'))->getIterator();
+$map = [];
+foreach ($iter as [$range, $prop, $status]) {
+    $diff = $range[1] - $range[0] + 1;
+
+    for ($i = 0; $i < $diff; ++$i) {
+        $map[$range[0] + $i] = $status;
+    }
+}
+
+(new Collection($map))->writeTo(OUTPUT_DIR . DS . 'normalizationProps.php');
+
 $combiningClass = $parser->parse('extracted/DerivedCombiningClass.txt');
-$virama = sprintf('/^[%s]$/u', $buildRegex($combiningClass->filter($only('9'))));
+$map = [];
+
+foreach ($combiningClass->filter($allExcept('0'))->getIterator() as $cc) {
+    $diff = $cc[0][1] - $cc[0][0] + 1;
+
+    for ($i = 0; $i < $diff; ++$i) {
+        $map[$cc[0][0] + $i] = (int) $cc[1];
+    }
+}
+
+(new Collection($map))->writeTo(OUTPUT_DIR . DS . 'combiningClass.php');
 
 $bidi = $parser->parse('extracted/DerivedBidiClass.txt')->sort($sort);
 
@@ -174,8 +198,6 @@ final class Regex
     public const BIDI_STEP_4_EN = '{$bidiStep4EN}';
     public const BIDI_STEP_5 = '{$bidiStep5}';
     public const BIDI_STEP_6 = '{$bidiStep6}';
-
-    public const VIRAMA = '{$virama}';
 
     public const ZWNJ = '{$zwnj}';
 
