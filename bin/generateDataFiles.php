@@ -75,13 +75,15 @@ $allExcept = static function (string ...$filters): Closure {
 
 $normalizationNfcProps = $parser->parse('DerivedNormalizationProps.txt');
 
+/** @var \Generator<int, array{0: array<int, int>, 1: string, 2: string}> */
 $iter = $normalizationNfcProps->filter($only('NFC_QC'))->getIterator();
 $map = [];
-foreach ($iter as [$range, $prop, $status]) {
-    $diff = $range[1] - $range[0] + 1;
+
+foreach ($iter as $props) {
+    $diff = $props[0][1] - $props[0][0] + 1;
 
     for ($i = 0; $i < $diff; ++$i) {
-        $map[$range[0] + $i] = $status;
+        $map[$props[0][0] + $i] = $props[2];
     }
 }
 
