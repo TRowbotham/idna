@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Rowbot\Idna;
 
 use Rowbot\Idna\Exception\MappingException;
-use Rowbot\Punycode\CodePoint;
 
 use function explode;
 use function sprintf;
