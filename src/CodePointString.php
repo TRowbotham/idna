@@ -96,7 +96,7 @@ class CodePointString extends PunycodeCodePointString
             }
 
             if ($isAllowed === self::MAYBE) {
-                return self::MAYBE;
+                $result = self::MAYBE;
             }
 
             $lastCanonicalClass = $canonicalClass;
