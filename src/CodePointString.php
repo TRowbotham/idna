@@ -9,9 +9,11 @@ use Normalizer;
 
 use function count;
 
+use const DIRECTORY_SEPARATOR as DS;
+
 class CodePointString extends PunycodeCodePointString
 {
-    protected const RESOURCE_DIR = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'resources';
+    protected const RESOURCE_DIR = __DIR__ . DS . '..' . DS . 'resources';
     protected const NO = 0;
     protected const YES = 1;
     protected const MAYBE = -1;
@@ -68,7 +70,7 @@ class CodePointString extends PunycodeCodePointString
     protected function quickCheckNFC(): int
     {
         if (!isset(self::$normalizationProps)) {
-            self::$normalizationProps = require self::RESOURCE_DIR . DIRECTORY_SEPARATOR . 'normalizationProps.php';
+            self::$normalizationProps = require self::RESOURCE_DIR . DS . 'normalizationProps.php';
         }
 
         $lastCanonicalClass = 0;

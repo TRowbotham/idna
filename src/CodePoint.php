@@ -6,9 +6,11 @@ namespace Rowbot\Idna;
 
 use Rowbot\Punycode\CodePoint as PunycodeCodePoint;
 
+use const DIRECTORY_SEPARATOR as DS;
+
 class CodePoint extends PunycodeCodePoint
 {
-    protected const RESOURCE_DIR = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'resources';
+    protected const RESOURCE_DIR = __DIR__ . DS . '..' . DS . 'resources';
 
     public const COMBINING_CLASS_VIRAMA = 9;
 
@@ -20,7 +22,7 @@ class CodePoint extends PunycodeCodePoint
     public static function getCombiningClass(int $codePoint): int
     {
         if (!isset(self::$combiningClass)) {
-            self::$combiningClass = require self::RESOURCE_DIR . DIRECTORY_SEPARATOR . 'combiningClass.php';
+            self::$combiningClass = require self::RESOURCE_DIR . DS . 'combiningClass.php';
         }
 
         // We only store code points with a non-zero combining class, so if a code point isn't

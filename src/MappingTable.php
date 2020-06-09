@@ -11,18 +11,12 @@ use function sprintf;
 use function strpos;
 use function substr;
 
-use const DIRECTORY_SEPARATOR;
+use const DIRECTORY_SEPARATOR as DS;
 
 class MappingTable
 {
     private const DISALLOWED_PREFIX = 'disallowed_STD3_';
-    private const LOOKUP_TABLE = __DIR__
-        . DIRECTORY_SEPARATOR
-        . '..'
-        . DIRECTORY_SEPARATOR
-        . 'resources'
-        . DIRECTORY_SEPARATOR
-        . 'mappingTable.php';
+    private const LOOKUP_TABLE = __DIR__ . DS . '..' . DS . 'resources' . DS . 'mappingTable.php';
 
     /**
      * @var array<int, array{codepoints: array<int, int>, status: string, mapping?: string, idna2008_status?: string}>
