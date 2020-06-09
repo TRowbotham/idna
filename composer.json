@@ -1,7 +1,7 @@
 {
     "name": "rowbot/idna",
     "description": "An implementation of UTS#46 Unicode IDNA Compatibility Processing.",
-    "keywords": ["idna", "unicode", "tr46", "international domain names"],
+    "keywords": ["idna", "unicode", "tr46", "international domain names", "uts46", "iri", "idn"],
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -26,7 +26,7 @@
     },
     "require": {
         "php": ">=7.1",
-        "rowbot/punycode": "@dev",
+        "rowbot/punycode": "^1.0",
         "symfony/polyfill-intl-normalizer": "^1.15"
     },
     "require-dev": {
