@@ -14,8 +14,9 @@ use const DIRECTORY_SEPARATOR as DS;
 class CodePointString extends PunycodeCodePointString
 {
     protected const RESOURCE_DIR = __DIR__ . DS . '..' . DS . 'resources';
-    protected const NO = 0;
-    protected const YES = 1;
+
+    protected const NO    = 0;
+    protected const YES   = 1;
     protected const MAYBE = -1;
 
     /**
@@ -40,15 +41,6 @@ class CodePointString extends PunycodeCodePointString
         return $this->codePoints[$index] ?? null;
     }
 
-    public function maybeNormalize(): string
-    {
-        if ($this->quickCheckNFC() === self::YES) {
-            return $this->input;
-        }
-
-        return Normalizer::normalize($this->input, Normalizer::FORM_C);
-    }
-
     public function isNormalized(): bool
     {
         $result = $this->quickCheckNFC();
@@ -62,6 +54,15 @@ class CodePointString extends PunycodeCodePointString
         }
 
         return $this->input === Normalizer::normalize($this->input, Normalizer::FORM_C);
+    }
+
+    public function maybeNormalize(): string
+    {
+        if ($this->quickCheckNFC() === self::YES) {
+            return $this->input;
+        }
+
+        return Normalizer::normalize($this->input, Normalizer::FORM_C);
     }
 
     /**
