@@ -13,7 +13,7 @@ use function implode;
 use function strlen;
 
 /**
- * @implements \IteratorAggregate<int, \Rowbot\Idna\Label>
+ * @implements \IteratorAggregate<int, string>
  */
 class Domain implements Countable, IteratorAggregate
 {
@@ -30,7 +30,7 @@ class Domain implements Countable, IteratorAggregate
     protected $errors;
 
     /**
-     * @var array<int, \Rowbot\Idna\Label>
+     * @var array<int, string>
      */
     protected $labels;
 
@@ -45,7 +45,7 @@ class Domain implements Countable, IteratorAggregate
     protected $transitionalDifferent;
 
     /**
-     * @param array<int, \Rowbot\Idna\Label> $labels
+     * @param array<int, string> $labels
      */
     public function __construct(array $labels, int $errors)
     {
@@ -72,7 +72,7 @@ class Domain implements Countable, IteratorAggregate
     }
 
     /**
-     * @return \Generator<int, \Rowbot\Idna\Label>
+     * @return \Generator<int, string>
      */
     public function getIterator(): Generator
     {
@@ -104,7 +104,7 @@ class Domain implements Countable, IteratorAggregate
         return $this->validBidi;
     }
 
-    public function replaceLabelAt(int $index, Label $label): void
+    public function replaceLabelAt(int $index, string $label): void
     {
         $this->labels[$index] = $label;
     }
@@ -139,16 +139,16 @@ class Domain implements Countable, IteratorAggregate
         // Increase the max size by 1, making it 254, to account for the root label's "."
         // delimiter. This also means we don't need to check the last label's length for being too
         // long.
-        if ($length > 1 && $this->labels[$length - 1]->isEmpty()) {
+        if ($length > 1 && $this->labels[$length - 1] === '') {
             ++$maxDomainSize;
             --$length;
         }
 
         for ($i = 0; $i < $length; ++$i) {
-            $bytes = $this->labels[$i]->getBytes();
+            $bytes = strlen($this->labels[$i]);
             $totalLength += $bytes;
 
-            if ($bytes > Label::MAX_LABEL_SIZE) {
+            if ($bytes > LabelValidator::MAX_LABEL_SIZE) {
                 $this->errors |= Idna::ERROR_LABEL_TOO_LONG;
             }
         }

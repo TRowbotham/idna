@@ -105,13 +105,7 @@ class Utf8String
 
     public function toDomain(): Domain
     {
-        $labels = [];
-
-        foreach (explode('.', $this->string) as $label) {
-            $labels[] = new Label($label);
-        }
-
-        $domain = new Domain($labels, $this->errors);
+        $domain = new Domain(explode('.', $this->string), $this->errors);
 
         if ($this->transitionalDifferent) {
             $domain->setTransitionalDifferent();

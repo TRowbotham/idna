@@ -8,6 +8,8 @@ use Rowbot\Punycode\Exception\PunycodeException;
 use Rowbot\Punycode\Punycode;
 
 use function array_merge;
+use function preg_match;
+use function strpbrk;
 
 /**
  * @see https://www.unicode.org/reports/tr46/
@@ -75,14 +77,15 @@ final class Idna
         // Step 3. Break the string into labels at U+002E (.) FULL STOP.
         $domain = $input->toDomain();
         $lastLabelIndex = $domain->count() - 1;
+        $validator = new LabelValidator($domain);
 
         // Step 4. Convert and validate each label in the domain name string.
         foreach ($domain as $i => $label) {
             $validationOptions = $options;
 
-            if ($label->hasAcePrefix()) {
+            if (substr($label, 0, 4) === 'xn--') {
                 try {
-                    $label = new Label(Punycode::decode($label->withoutAcePrefix()->toString()));
+                    $label = Punycode::decode(substr($label, 4));
                 } catch (PunycodeException $e) {
                     $domain->addError(self::ERROR_PUNYCODE);
 
@@ -93,7 +96,7 @@ final class Idna
                 $domain->replaceLabelAt($i, $label);
             }
 
-            $label->validate($domain, $validationOptions, $i > 0 && $i === $lastLabelIndex);
+            $validator->validate($label, $validationOptions, $i > 0 && $i === $lastLabelIndex);
         }
 
         if ($domain->isBidi() && !$domain->isValidBidi()) {
@@ -121,13 +124,13 @@ final class Idna
             // Only convert labels to punycode that contain non-ASCII code points and only if that
             // label does not contain a character from the gen-delims set specified in
             // {@link https://ietf.org/rfc/rfc3987.html#section-2.2}
-            if ($label->containsNonAscii()) {
-                if ($label->containsUrlDelimiter()) {
+            if (preg_match('/[^\x00-\x7F]/', $label) === 1) {
+                if (strpbrk($label, ':/?#[]@') !== false) {
                     continue;
                 }
 
                 try {
-                    $label = new Label('xn--' . Punycode::encode($label->toString()));
+                    $label = 'xn--' . Punycode::encode($label);
                 } catch (PunycodeException $e) {
                     $domain->addError(self::ERROR_PUNYCODE);
                 }

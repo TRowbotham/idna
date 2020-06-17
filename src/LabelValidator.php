@@ -9,62 +9,36 @@ use Rowbot\Idna\Resource\Regex;
 
 use function preg_match;
 use function strlen;
-use function strpbrk;
 use function strpos;
 use function substr;
 
 use const PREG_OFFSET_CAPTURE;
 
-class Label
+class LabelValidator
 {
     private const HYPHEN = 0x002D;
     public const MAX_LABEL_SIZE = 63;
 
     /**
-     * @var string
+     * @var \Rowbot\Idna\Domain
      */
-    protected $label;
+    protected $domain;
 
-    public function __construct(string $label)
+    public function __construct(Domain $domain)
     {
-        $this->label = $label;
+        $this->domain = $domain;
     }
 
-    public function containsUrlDelimiter(): bool
-    {
-        return strpbrk($this->label, ':/?#[]@') !== false;
-    }
-
-    public function containsNonAscii(): bool
-    {
-        return preg_match('/[^\x00-\x7F]/', $this->label) === 1;
-    }
-
-    public function getBytes(): int
-    {
-        return strlen($this->label);
-    }
-
-    public function hasAcePrefix(): bool
-    {
-        return substr($this->label, 0, 4) === 'xn--';
-    }
-
-    public function isEmpty(): bool
-    {
-        return $this->label === '';
-    }
-
-    public function isValidContextJ(CodePointString $label): bool
+    protected function isValidContextJ(string $label, CodePointString $codePoints): bool
     {
         $offset = 0;
 
-        foreach ($label as $i => $codePoint) {
+        foreach ($codePoints as $i => $codePoint) {
             if ($codePoint !== 0x200C && $codePoint !== 0x200D) {
                 continue;
             }
 
-            $prev = $label->codePointAt($i - 1);
+            $prev = $codePoints->codePointAt($i - 1);
 
             if ($prev === null) {
                 return false;
@@ -80,13 +54,7 @@ class Label
             // Generated RegExp = ([Joining_Type:{L,D}][Joining_Type:T]*\u200C[Joining_Type:T]*)[Joining_Type:{R,D}]
             if (
                 $codePoint === 0x200C
-                && preg_match(
-                    Regex::ZWNJ,
-                    $this->label,
-                    $matches,
-                    PREG_OFFSET_CAPTURE,
-                    $offset
-                ) === 1
+                && preg_match(Regex::ZWNJ, $label, $matches, PREG_OFFSET_CAPTURE, $offset) === 1
             ) {
                 $offset += strlen($matches[1][0]);
 
@@ -99,65 +67,60 @@ class Label
         return true;
     }
 
-    public function toString(): string
-    {
-        return $this->label;
-    }
-
     /**
      * @see https://www.unicode.org/reports/tr46/#Validity_Criteria
      *
      * @param array<string, bool> $options
      */
-    public function validate(Domain $domain, array $options, bool $canBeEmpty): void
+    public function validate(string $label, array $options, bool $canBeEmpty): void
     {
-        if ($this->label === '') {
+        if ($label === '') {
             if (
                 !$canBeEmpty
                 && (!isset($options['VerifyDnsLength']) || $options['VerifyDnsLength'])
             ) {
-                $domain->addError(Idna::ERROR_EMPTY_LABEL);
+                $this->domain->addError(Idna::ERROR_EMPTY_LABEL);
             }
 
             return;
         }
 
-        $label = new CodePointString($this->label);
+        $codePoints = new CodePointString($label);
 
         // Step 1. The label must be in Unicode Normalization Form C.
-        if (!$label->isNormalized()) {
-            $domain->addError(Idna::ERROR_INVALID_ACE_LABEL);
+        if (!$codePoints->isNormalized()) {
+            $this->domain->addError(Idna::ERROR_INVALID_ACE_LABEL);
         }
 
         if ($options['CheckHyphens']) {
             // Step 2. If CheckHyphens, the label must not contain a U+002D HYPHEN-MINUS character
             // in both the thrid and fourth positions.
             if (
-                $label->codePointAt(2) === self::HYPHEN
-                && $label->codePointAt(3) === self::HYPHEN
+                $codePoints->codePointAt(2) === self::HYPHEN
+                && $codePoints->codePointAt(3) === self::HYPHEN
             ) {
-                $domain->addError(Idna::ERROR_HYPHEN_3_4);
+                $this->domain->addError(Idna::ERROR_HYPHEN_3_4);
             }
 
             // Step 3. If CheckHyphens, the label must neither begin nor end with a U+002D
             // HYPHEN-MINUS character.
-            if (substr($this->label, 0, 1) === '-') {
-                $domain->addError(Idna::ERROR_LEADING_HYPHEN);
+            if (substr($label, 0, 1) === '-') {
+                $this->domain->addError(Idna::ERROR_LEADING_HYPHEN);
             }
 
-            if (substr($this->label, -1, 1) === '-') {
-                $domain->addError(Idna::ERROR_TRAILING_HYPHEN);
+            if (substr($label, -1, 1) === '-') {
+                $this->domain->addError(Idna::ERROR_TRAILING_HYPHEN);
             }
         }
 
         // Step 4. The label must not contain a U+002E (.) FULL STOP.
-        if (strpos($this->label, '.') !== false) {
-            $domain->addError(Idna::ERROR_LABEL_HAS_DOT);
+        if (strpos($label, '.') !== false) {
+            $this->domain->addError(Idna::ERROR_LABEL_HAS_DOT);
         }
 
         // Step 5. The label must not begin with a combining mark, that is: General_Category=Mark.
-        if (preg_match(Regex::COMBINING_MARK, $this->label, $matches) === 1) {
-            $domain->addError(Idna::ERROR_LEADING_COMBINING_MARK);
+        if (preg_match(Regex::COMBINING_MARK, $label, $matches) === 1) {
+            $this->domain->addError(Idna::ERROR_LEADING_COMBINING_MARK);
         }
 
         // Step 6. Each code point in the label must only have certain status values according to
@@ -166,7 +129,7 @@ class Label
         $transitional = $options['Transitional_Processing'];
         $useSTD3ASCIIRules = $options['UseSTD3ASCIIRules'];
 
-        foreach ($label as $codePoint) {
+        foreach ($codePoints as $codePoint) {
             $data = $table->lookup($codePoint, $useSTD3ASCIIRules);
             $status = $data['status'];
 
@@ -174,7 +137,7 @@ class Label
                 continue;
             }
 
-            $domain->addError(Idna::ERROR_DISALLOWED);
+            $this->domain->addError(Idna::ERROR_DISALLOWED);
 
             break;
         }
@@ -182,55 +145,55 @@ class Label
         // Step 7. If CheckJoiners, the label must satisify the ContextJ rules from Appendix A, in
         // The Unicode Code Points and Internationalized Domain Names for Applications (IDNA)
         // [IDNA2008].
-        if ($options['CheckJoiners'] && !$this->isValidContextJ($label)) {
-            $domain->addError(Idna::ERROR_CONTEXTJ);
+        if ($options['CheckJoiners'] && !$this->isValidContextJ($label, $codePoints)) {
+            $this->domain->addError(Idna::ERROR_CONTEXTJ);
         }
 
         // Step 8. If CheckBidi, and if the domain name is a  Bidi domain name, then the label must
         // satisfy all six of the numbered conditions in [IDNA2008] RFC 5893, Section 2.
-        if ($options['CheckBidi'] && (!$domain->isBidi() || $domain->isValidBidi())) {
-            $this->validateBidi($domain);
+        if ($options['CheckBidi'] && (!$this->domain->isBidi() || $this->domain->isValidBidi())) {
+            $this->validateBidi($label);
         }
     }
 
     /**
      * @see https://tools.ietf.org/html/rfc5893#section-2
      */
-    private function validateBidi(Domain $domain): void
+    protected function validateBidi(string $label): void
     {
-        if (preg_match(Regex::RTL_LABEL, $this->label) === 1) {
-            $domain->setBidi();
+        if (preg_match(Regex::RTL_LABEL, $label) === 1) {
+            $this->domain->setBidi();
 
             // Step 1. The first character must be a character with Bidi property L, R, or AL.
             // If it has the R or AL property, it is an RTL label
-            if (preg_match(Regex::BIDI_STEP_1_RTL, $this->label) !== 1) {
-                $domain->setInvalidBidi();
+            if (preg_match(Regex::BIDI_STEP_1_RTL, $label) !== 1) {
+                $this->domain->setInvalidBidi();
 
                 return;
             }
 
             // Step 2. In an RTL label, only characters with the Bidi properties R, AL, AN, EN, ES,
             // CS, ET, ON, BN, or NSM are allowed.
-            if (preg_match(Regex::BIDI_STEP_2, $this->label) === 1) {
-                $domain->setInvalidBidi();
+            if (preg_match(Regex::BIDI_STEP_2, $label) === 1) {
+                $this->domain->setInvalidBidi();
 
                 return;
             }
 
             // Step 3. In an RTL label, the end of the label must be a character with Bidi property
             // R, AL, EN, or AN, followed by zero or more characters with Bidi property NSM.
-            if (preg_match(Regex::BIDI_STEP_3, $this->label) !== 1) {
-                $domain->setInvalidBidi();
+            if (preg_match(Regex::BIDI_STEP_3, $label) !== 1) {
+                $this->domain->setInvalidBidi();
 
                 return;
             }
 
             // Step 4. In an RTL label, if an EN is present, no AN may be present, and vice versa.
             if (
-                preg_match(Regex::BIDI_STEP_4_AN, $this->label) === 1
-                && preg_match(Regex::BIDI_STEP_4_EN, $this->label) === 1
+                preg_match(Regex::BIDI_STEP_4_AN, $label) === 1
+                && preg_match(Regex::BIDI_STEP_4_EN, $label) === 1
             ) {
-                $domain->setInvalidBidi();
+                $this->domain->setInvalidBidi();
 
                 return;
             }
@@ -241,36 +204,26 @@ class Label
         // We are a LTR label
         // Step 1. The first character must be a character with Bidi property L, R, or AL.
         // If it has the L property, it is an LTR label.
-        if (preg_match(Regex::BIDI_STEP_1_LTR, $this->label) !== 1) {
-            $domain->setInvalidBidi();
+        if (preg_match(Regex::BIDI_STEP_1_LTR, $label) !== 1) {
+            $this->domain->setInvalidBidi();
 
             return;
         }
 
         // Step 5. In an LTR label, only characters with the Bidi properties L, EN,
         // ES, CS, ET, ON, BN, or NSM are allowed.
-        if (preg_match(Regex::BIDI_STEP_5, $this->label) === 1) {
-            $domain->setInvalidBidi();
+        if (preg_match(Regex::BIDI_STEP_5, $label) === 1) {
+            $this->domain->setInvalidBidi();
 
             return;
         }
 
         // Step 6.In an LTR label, the end of the label must be a character with Bidi property L or
         // EN, followed by zero or more characters with Bidi property NSM.
-        if (preg_match(Regex::BIDI_STEP_6, $this->label) !== 1) {
-            $domain->setInvalidBidi();
+        if (preg_match(Regex::BIDI_STEP_6, $label) !== 1) {
+            $this->domain->setInvalidBidi();
 
             return;
         }
-    }
-
-    public function withoutAcePrefix(): self
-    {
-        return new self(substr($this->label, 4));
-    }
-
-    public function __toString(): string
-    {
-        return $this->label;
     }
 }
