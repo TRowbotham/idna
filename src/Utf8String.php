@@ -6,21 +6,10 @@ namespace Rowbot\Idna;
 
 use Rowbot\Idna\Exception\MappingException;
 
-use function explode;
 use function sprintf;
 
 class Utf8String
 {
-    /**
-     * @var bool
-     */
-    protected $transitionalDifferent;
-
-    /**
-     * @var int
-     */
-    protected $errors;
-
     /**
      * @var string
      */
@@ -28,8 +17,6 @@ class Utf8String
 
     public function __construct(string $string)
     {
-        $this->transitionalDifferent = false;
-        $this->errors = 0;
         $this->string = $string;
     }
 
@@ -43,20 +30,22 @@ class Utf8String
      *
      * @param array<string, bool> $options
      */
-    public function mapCodePoints(array $options): self
+    public function mapCodePoints(array $options, DomainInfo $info): self
     {
         $codePoints = new CodePointString($this->string);
         $table = new MappingTable();
         $str = '';
         $useSTD3ASCIIRules = $options['UseSTD3ASCIIRules'];
         $transitional = $options['Transitional_Processing'];
+        $errors = 0;
+        $transitionalDifferent = false;
 
         foreach ($codePoints as $codePoint) {
             $data = $table->lookup($codePoint, $useSTD3ASCIIRules);
 
             switch ($data['status']) {
                 case 'disallowed':
-                    $this->errors |= Idna::ERROR_DISALLOWED;
+                    $errors |= Idna::ERROR_DISALLOWED;
 
                     // no break.
 
@@ -75,7 +64,7 @@ class Utf8String
                     break;
 
                 case 'deviation':
-                    $this->transitionalDifferent = true;
+                    $transitionalDifferent = true;
                     $str .= ($transitional ? $data['mapping'] : CodePoint::encode($codePoint));
 
                     break;
@@ -86,6 +75,12 @@ class Utf8String
                         $data['status']
                     ));
             }
+        }
+
+        $info->addError($errors);
+
+        if ($transitionalDifferent) {
+            $info->setTransitionalDifferent();
         }
 
         $copy = clone $this;
@@ -103,14 +98,8 @@ class Utf8String
         return $copy;
     }
 
-    public function toDomain(): Domain
+    public function toString(): string
     {
-        $domain = new Domain(explode('.', $this->string), $this->errors);
-
-        if ($this->transitionalDifferent) {
-            $domain->setTransitionalDifferent();
-        }
-
-        return $domain;
+        return $this->string;
     }
 }

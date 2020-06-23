@@ -31,7 +31,7 @@ composer require rowbot/idna
 
 ## API
 
-### Idna::toAscii(string $domainName, array $options = []): IdnaResult
+### Idna::toAscii(string $domain, array $options = []): IdnaResult
 
 Converts a domain name to its ASCII form. Anytime an error is recorded while doing an ASCII
 transformation, the transformation is considered to have failed and whatever domain name string is
@@ -71,7 +71,7 @@ options include:
   echo $result->getDomain(); // x-.xn--nxa
   ```
 
-### Idna::toUnicode(string $domainName, array $options = []): IdnaResult
+### Idna::toUnicode(string $domain, array $options = []): IdnaResult
 
 Converts the domain name to its Unicode form. Unlike the toAscii transformation, toUnicode does not
 have a failure concept. This means that you can always use the returned string. However, deciding

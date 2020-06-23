@@ -21,11 +21,11 @@ class IdnaResult
      */
     protected $transitionalDifferent;
 
-    public function __construct(Domain $domain)
+    public function __construct(string $domain, DomainInfo $info)
     {
-        $this->domain = $domain->toString();
-        $this->errors = $domain->getErrors();
-        $this->transitionalDifferent = $domain->isTransitionalDifferent();
+        $this->domain = $domain;
+        $this->errors = $info->getErrors();
+        $this->transitionalDifferent = $info->isTransitionalDifferent();
     }
 
     public function getDomain(): string

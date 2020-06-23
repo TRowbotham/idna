@@ -18,21 +18,20 @@ use const PREG_OFFSET_CAPTURE;
 class LabelValidator
 {
     private const HYPHEN = 0x002D;
-    public const MAX_LABEL_SIZE = 63;
 
     /**
-     * @var \Rowbot\Idna\Domain
+     * @var \Rowbot\Idna\DomainInfo
      */
-    protected $domain;
+    protected $info;
 
     /**
      * @var array<int, int>
      */
     protected static $virama;
 
-    public function __construct(Domain $domain)
+    public function __construct(DomainInfo $info)
     {
-        $this->domain = $domain;
+        $this->info = $info;
 
         if (!isset(self::$virama)) {
             self::$virama = require __DIR__ . DS . '..' . DS . 'resources' . DS . 'virama.php';
@@ -89,7 +88,7 @@ class LabelValidator
                 !$canBeEmpty
                 && (!isset($options['VerifyDnsLength']) || $options['VerifyDnsLength'])
             ) {
-                $this->domain->addError(Idna::ERROR_EMPTY_LABEL);
+                $this->info->addError(Idna::ERROR_EMPTY_LABEL);
             }
 
             return;
@@ -99,7 +98,7 @@ class LabelValidator
 
         // Step 1. The label must be in Unicode Normalization Form C.
         if (!$codePoints->isNormalized()) {
-            $this->domain->addError(Idna::ERROR_INVALID_ACE_LABEL);
+            $this->info->addError(Idna::ERROR_INVALID_ACE_LABEL);
         }
 
         if ($options['CheckHyphens']) {
@@ -109,28 +108,28 @@ class LabelValidator
                 $codePoints->codePointAt(2) === self::HYPHEN
                 && $codePoints->codePointAt(3) === self::HYPHEN
             ) {
-                $this->domain->addError(Idna::ERROR_HYPHEN_3_4);
+                $this->info->addError(Idna::ERROR_HYPHEN_3_4);
             }
 
             // Step 3. If CheckHyphens, the label must neither begin nor end with a U+002D
             // HYPHEN-MINUS character.
             if (substr($label, 0, 1) === '-') {
-                $this->domain->addError(Idna::ERROR_LEADING_HYPHEN);
+                $this->info->addError(Idna::ERROR_LEADING_HYPHEN);
             }
 
             if (substr($label, -1, 1) === '-') {
-                $this->domain->addError(Idna::ERROR_TRAILING_HYPHEN);
+                $this->info->addError(Idna::ERROR_TRAILING_HYPHEN);
             }
         }
 
         // Step 4. The label must not contain a U+002E (.) FULL STOP.
         if (strpos($label, '.') !== false) {
-            $this->domain->addError(Idna::ERROR_LABEL_HAS_DOT);
+            $this->info->addError(Idna::ERROR_LABEL_HAS_DOT);
         }
 
         // Step 5. The label must not begin with a combining mark, that is: General_Category=Mark.
         if (preg_match(Regex::COMBINING_MARK, $label, $matches) === 1) {
-            $this->domain->addError(Idna::ERROR_LEADING_COMBINING_MARK);
+            $this->info->addError(Idna::ERROR_LEADING_COMBINING_MARK);
         }
 
         // Step 6. Each code point in the label must only have certain status values according to
@@ -147,7 +146,7 @@ class LabelValidator
                 continue;
             }
 
-            $this->domain->addError(Idna::ERROR_DISALLOWED);
+            $this->info->addError(Idna::ERROR_DISALLOWED);
 
             break;
         }
@@ -156,12 +155,15 @@ class LabelValidator
         // The Unicode Code Points and Internationalized Domain Names for Applications (IDNA)
         // [IDNA2008].
         if ($options['CheckJoiners'] && !$this->isValidContextJ($label, $codePoints)) {
-            $this->domain->addError(Idna::ERROR_CONTEXTJ);
+            $this->info->addError(Idna::ERROR_CONTEXTJ);
         }
 
         // Step 8. If CheckBidi, and if the domain name is a  Bidi domain name, then the label must
         // satisfy all six of the numbered conditions in [IDNA2008] RFC 5893, Section 2.
-        if ($options['CheckBidi'] && (!$this->domain->isBidi() || $this->domain->isValidBidi())) {
+        if (
+            $options['CheckBidi']
+            && (!$this->info->isBidiDomain() || $this->info->isValidBidiDomain())
+        ) {
             $this->validateBidi($label);
         }
     }
@@ -172,12 +174,12 @@ class LabelValidator
     protected function validateBidi(string $label): void
     {
         if (preg_match(Regex::RTL_LABEL, $label) === 1) {
-            $this->domain->setBidi();
+            $this->info->setBidiDomain();
 
             // Step 1. The first character must be a character with Bidi property L, R, or AL.
             // If it has the R or AL property, it is an RTL label
             if (preg_match(Regex::BIDI_STEP_1_RTL, $label) !== 1) {
-                $this->domain->setInvalidBidi();
+                $this->info->setInvalidBidiDomain();
 
                 return;
             }
@@ -185,7 +187,7 @@ class LabelValidator
             // Step 2. In an RTL label, only characters with the Bidi properties R, AL, AN, EN, ES,
             // CS, ET, ON, BN, or NSM are allowed.
             if (preg_match(Regex::BIDI_STEP_2, $label) === 1) {
-                $this->domain->setInvalidBidi();
+                $this->info->setInvalidBidiDomain();
 
                 return;
             }
@@ -193,7 +195,7 @@ class LabelValidator
             // Step 3. In an RTL label, the end of the label must be a character with Bidi property
             // R, AL, EN, or AN, followed by zero or more characters with Bidi property NSM.
             if (preg_match(Regex::BIDI_STEP_3, $label) !== 1) {
-                $this->domain->setInvalidBidi();
+                $this->info->setInvalidBidiDomain();
 
                 return;
             }
@@ -203,7 +205,7 @@ class LabelValidator
                 preg_match(Regex::BIDI_STEP_4_AN, $label) === 1
                 && preg_match(Regex::BIDI_STEP_4_EN, $label) === 1
             ) {
-                $this->domain->setInvalidBidi();
+                $this->info->setInvalidBidiDomain();
 
                 return;
             }
@@ -215,7 +217,7 @@ class LabelValidator
         // Step 1. The first character must be a character with Bidi property L, R, or AL.
         // If it has the L property, it is an LTR label.
         if (preg_match(Regex::BIDI_STEP_1_LTR, $label) !== 1) {
-            $this->domain->setInvalidBidi();
+            $this->info->setInvalidBidiDomain();
 
             return;
         }
@@ -223,7 +225,7 @@ class LabelValidator
         // Step 5. In an LTR label, only characters with the Bidi properties L, EN,
         // ES, CS, ET, ON, BN, or NSM are allowed.
         if (preg_match(Regex::BIDI_STEP_5, $label) === 1) {
-            $this->domain->setInvalidBidi();
+            $this->info->setInvalidBidiDomain();
 
             return;
         }
@@ -231,7 +233,7 @@ class LabelValidator
         // Step 6.In an LTR label, the end of the label must be a character with Bidi property L or
         // EN, followed by zero or more characters with Bidi property NSM.
         if (preg_match(Regex::BIDI_STEP_6, $label) !== 1) {
-            $this->domain->setInvalidBidi();
+            $this->info->setInvalidBidiDomain();
 
             return;
         }
