@@ -12,6 +12,7 @@ use function strlen;
 use function strpos;
 use function substr;
 
+use const DIRECTORY_SEPARATOR as DS;
 use const PREG_OFFSET_CAPTURE;
 
 class LabelValidator
@@ -24,9 +25,18 @@ class LabelValidator
      */
     protected $domain;
 
+    /**
+     * @var array<int, int>
+     */
+    protected static $virama;
+
     public function __construct(Domain $domain)
     {
         $this->domain = $domain;
+
+        if (!isset(self::$virama)) {
+            self::$virama = require __DIR__ . DS . '..' . DS . 'resources' . DS . 'virama.php';
+        }
     }
 
     protected function isValidContextJ(string $label, CodePointString $codePoints): bool
@@ -45,7 +55,7 @@ class LabelValidator
             }
 
             // If Canonical_Combining_Class(Before(cp)) .eq. Virama Then True;
-            if (CodePoint::getCombiningClass($prev) === CodePoint::COMBINING_CLASS_VIRAMA) {
+            if (isset(self::$virama[$prev])) {
                 continue;
             }
 

@@ -101,6 +101,17 @@ foreach ($combiningClass->filter($allExcept('0'))->getIterator() as $cc) {
 }
 
 (new Collection($map))->writeTo(OUTPUT_DIR . DS . 'combiningClass.php');
+$map = [];
+
+foreach ($combiningClass->sort($sort)->filter($only('9'))->getIterator() as $cc) {
+    $diff = $cc[0][1] - $cc[0][0] + 1;
+
+    for ($i = 0; $i < $diff; ++$i) {
+        $map[$cc[0][0] + $i] = (int) $cc[1];
+    }
+}
+
+(new Collection($map))->writeTo(OUTPUT_DIR . DS . 'virama.php');
 
 $bidi = $parser->parse('extracted/DerivedBidiClass.txt')->sort($sort);
 
