@@ -33,5 +33,5 @@ parameters:
         # This error can safely be ignored as we do these checks when building the data files.
         -
             message: "#Offset 'mapping' does not exist on array\\('codepoints' => array<int, int>, 'status' => string, \\?'mapping' => string, \\?'idna2008_status' => string\\)\\.#"
-            path: src/Utf8String.php
+            path: src/Idna.php
             count: 2

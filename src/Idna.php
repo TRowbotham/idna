@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Rowbot\Idna;
 
+use Rowbot\Idna\Exception\MappingException;
 use Rowbot\Punycode\Exception\PunycodeException;
 use Rowbot\Punycode\Punycode;
 
@@ -58,32 +59,94 @@ final class Idna
     }
 
     /**
+     * @see https://www.unicode.org/reports/tr46/#ProcessingStepMap
+     *
+     * @param array<string, bool> $options
+     */
+    private static function mapCodePoints(string $domain, array $options, DomainInfo $info): string
+    {
+        $codePoints = new CodePointString($domain);
+        $table = new MappingTable();
+        $str = '';
+        $useSTD3ASCIIRules = $options['UseSTD3ASCIIRules'];
+        $transitional = $options['Transitional_Processing'];
+        $errors = 0;
+        $transitionalDifferent = false;
+
+        foreach ($codePoints as $codePoint) {
+            $data = $table->lookup($codePoint, $useSTD3ASCIIRules);
+
+            switch ($data['status']) {
+                case 'disallowed':
+                    $errors |= Idna::ERROR_DISALLOWED;
+
+                    // no break.
+
+                case 'valid':
+                    $str .= CodePoint::encode($codePoint);
+
+                    break;
+
+                case 'ignored':
+                    // Do nothing.
+                    break;
+
+                case 'mapped':
+                    $str .= $data['mapping'];
+
+                    break;
+
+                case 'deviation':
+                    $transitionalDifferent = true;
+                    $str .= ($transitional ? $data['mapping'] : CodePoint::encode($codePoint));
+
+                    break;
+
+                default:
+                    throw new MappingException(sprintf(
+                        'Unknown mapping status %s.',
+                        $data['status']
+                    ));
+            }
+        }
+
+        $info->addError($errors);
+
+        if ($transitionalDifferent) {
+            $info->setTransitionalDifferent();
+        }
+
+        return $str;
+    }
+
+    /**
      * @see https://www.unicode.org/reports/tr46/#Processing
      *
      * @param array<string, bool> $options
      *
      * @return array<int, string>
      */
-    private static function process(Utf8String $domain, array $options, DomainInfo $info): array
+    private static function process(string $domain, array $options, DomainInfo $info): array
     {
         // If VerifyDnsLength is not set, we are doing ToUnicode otherwise we are doing ToASCII and
         // we need to respect the VerifyDnsLength option.
         $checkForEmptyLabels = !isset($options['VerifyDnsLength']) || $options['VerifyDnsLength'];
 
-        if ($checkForEmptyLabels && $domain->isEmpty()) {
+        if ($checkForEmptyLabels && $domain === '') {
             $info->addError(self::ERROR_EMPTY_LABEL);
 
             return [''];
         }
 
         // Step 1. Map each code point in the domain name string
-        $domain = $domain->mapCodePoints($options, $info);
+        $domain = self::mapCodePoints($domain, $options, $info);
 
         // Step 2. Normalize the domain name string to Unicode Normalization Form C.
-        $domain = $domain->normalize();
+        $codePoints = new CodePointString($domain);
+        $domain = $codePoints->maybeNormalize();
 
         // Step 3. Break the string into labels at U+002E (.) FULL STOP.
-        $labels = explode('.', $domain->toString());
+        $labels = explode('.', $domain);
         $lastLabelIndex = count($labels) - 1;
         $validator = new LabelValidator($info);
 
@@ -127,7 +190,7 @@ final class Idna
     {
         $options = array_merge(self::DEFAULT_ASCII_OPTIONS, $options);
         $info = new DomainInfo();
-        $labels = self::process(new Utf8String($domain), $options, $info);
+        $labels = self::process($domain, $options, $info);
 
         foreach ($labels as $i => $label) {
             // Only convert labels to punycode that contain non-ASCII code points and only if that
@@ -166,7 +229,7 @@ final class Idna
         unset($options['VerifyDnsLength']);
         $options = array_merge(self::DEFAULT_UNICODE_OPTIONS, $options);
         $info = new DomainInfo();
-        $labels = self::process(new Utf8String($domain), $options, $info);
+        $labels = self::process($domain, $options, $info);
 
         return new IdnaResult(implode('.', $labels), $info);
     }
