@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Rowbot\Idna;
 
-use Rowbot\Punycode\CodePointString as PunycodeCodePointString;
 use Normalizer;
+use Rowbot\Punycode\CodePointString as PunycodeCodePointString;
 
 use function count;
 

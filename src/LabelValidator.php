@@ -134,12 +134,11 @@ class LabelValidator
 
         // Step 6. Each code point in the label must only have certain status values according to
         // Section 5, IDNA Mapping Table:
-        $table = new MappingTable();
         $transitional = $options['Transitional_Processing'];
         $useSTD3ASCIIRules = $options['UseSTD3ASCIIRules'];
 
         foreach ($codePoints as $codePoint) {
-            $data = $table->lookup($codePoint, $useSTD3ASCIIRules);
+            $data = CodePointStatus::lookup($codePoint, $useSTD3ASCIIRules);
             $status = $data['status'];
 
             if ($status === 'valid' || (!$transitional && $status === 'deviation')) {

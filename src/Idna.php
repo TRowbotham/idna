@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Rowbot\Idna;
 
-use Rowbot\Idna\Exception\MappingException;
 use Rowbot\Punycode\Exception\PunycodeException;
 use Rowbot\Punycode\Punycode;
 
@@ -66,7 +65,6 @@ final class Idna
     private static function mapCodePoints(string $domain, array $options, DomainInfo $info): string
     {
         $codePoints = new CodePointString($domain);
-        $table = new MappingTable();
         $str = '';
         $useSTD3ASCIIRules = $options['UseSTD3ASCIIRules'];
         $transitional = $options['Transitional_Processing'];
@@ -74,7 +72,7 @@ final class Idna
         $transitionalDifferent = false;
 
         foreach ($codePoints as $codePoint) {
-            $data = $table->lookup($codePoint, $useSTD3ASCIIRules);
+            $data = CodePointStatus::lookup($codePoint, $useSTD3ASCIIRules);
 
             switch ($data['status']) {
                 case 'disallowed':
@@ -101,12 +99,6 @@ final class Idna
                     $str .= ($transitional ? $data['mapping'] : CodePoint::encode($codePoint));
 
                     break;
-
-                default:
-                    throw new MappingException(sprintf(
-                        'Unknown mapping status %s.',
-                        $data['status']
-                    ));
             }
         }
 
@@ -124,7 +116,7 @@ final class Idna
      *
      * @param array<string, bool> $options
      *
-     * @return array<int, string>
+     * @return list<string>
      */
     private static function process(string $domain, array $options, DomainInfo $info): array
     {
@@ -235,7 +227,7 @@ final class Idna
     }
 
     /**
-     * @param array<int, string> $labels
+     * @param list<string> $labels
      */
     private static function validateDomainAndLabelLength(array $labels, DomainInfo $info): void
     {

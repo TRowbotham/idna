@@ -10,28 +10,12 @@ parameters:
 
     ignoreErrors:
         -
-            message: '#Call to function is_int\(\) with int will always evaluate to true\.#'
-            path: bin/MappingTableParser.php
+            message: '#Parameter \#2 \$form of static method Normalizer::normalize\(\) expects int, string given\.#'
+            path: src/CodePointString.php
             count: 2
-        -
-            message: '#Call to function is_string\(\) with string will always evaluate to true\.#'
-            path: bin/MappingTableParser.php
-            count: 1
-        -
-            message: '#Result of && is always true\.#'
-            path: bin/MappingTableParser.php
-            count: 2
-        -
-            message: '#but returns Rowbot\\Idna\\Bin\\Collection<array<string, array<int, int>\|string>>\.#'
-            path: bin/MappingTableParser.php
-            count: 1
-        -
-            message: '#Method Rowbot\\Idna\\Bin\\PropertyParser::parse\(\) should return Rowbot\\Idna\\Bin\\Collection<array\(array<int, int>, string\)> but returns Rowbot\\Idna\\Bin\\Collection<array<int, array<int, int>\|string>>\.#'
-            path: bin/PropertyParser.php
-            count: 1
 
         # This error can safely be ignored as we do these checks when building the data files.
         -
-            message: "#Offset 'mapping' does not exist on array\\('codepoints' => array<int, int>, 'status' => string, \\?'mapping' => string, \\?'idna2008_status' => string\\)\\.#"
+            message: "#Offset 'mapping' does not exist on array\\('status' => string, \\?'mapping' => string\\)\\.#"
             path: src/Idna.php
             count: 2
