@@ -15,6 +15,8 @@ use function file_put_contents;
 use function intval;
 use function preg_match_all;
 
+use const DIRECTORY_SEPARATOR as DS;
+
 class IdnaDataBuilder extends Builder
 {
     private const SRC_DIR = __DIR__ . DS . '..' . DS . 'src';

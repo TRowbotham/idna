@@ -11,6 +11,8 @@ use function fgets;
 use function file_put_contents;
 use function var_export;
 
+use const DIRECTORY_SEPARATOR as DS;
+
 class NormalizationDataBuilder extends Builder
 {
     public static function buildCombiningClassHashMap(string $output): void
