@@ -81,7 +81,7 @@ class IdnaDataBuilder extends Builder
         }
 RANGE_FALLBACK;
 
-                        continue 1;
+                        continue 2;
                     }
 
                     for ($i = 0; $i < $diff; ++$i) {
