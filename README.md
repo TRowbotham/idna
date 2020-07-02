@@ -1,5 +1,11 @@
 # IDNA
 
+[![License](https://img.shields.io/github/license/TRowbotham/idna?style=flat-square)](https://github.com/TRowbotham/URL-Parser/blob/master/LICENSE)
+[![Build Status](https://img.shields.io/travis/com/TRowbotham/idna/master?style=flat-square)](https://travis-ci.com/github/TRowbotham/idna)
+[![Code Coverage](https://img.shields.io/codecov/c/github/TRowbotham/idna/master?style=flat-square)](https://codecov.io/gh/TRowbotham/idna)
+[![Version](https://img.shields.io/packagist/v/rowbot/idna?style=flat-square)](https://packagist.org/packages/rowbot/idna)
+[![Downloads](https://img.shields.io/packagist/dt/rowbot/idna?style=flat-square)](https://packagist.org/packages/rowbot/idna)
+
 A fully compliant implementation of [UTS#46](https://www.unicode.org/reports/tr46/), otherwise known
 as Unicode IDNA Compatibility Processing. You can read more about the differences between IDNA2003,
 IDNA2008, and UTS#46 in [Section 7. IDNA Comparison](https://www.unicode.org/reports/tr46/#IDNAComparison)
