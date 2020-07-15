@@ -15,6 +15,4 @@ require ROOT_DIR . DS . 'vendor' . DS . 'autoload.php';
 
 ViramaDataBuilder::buildHashMap(OUTPUT_DIR);
 RegexBuilder::buildRegexClass(OUTPUT_DIR);
-NormalizationDataBuilder::buildCombiningClassHashMap(OUTPUT_DIR);
-NormalizationDataBuilder::buildNormalizationPropsHashMap(OUTPUT_DIR);
 IdnaDataBuilder::buildHashMaps(OUTPUT_DIR);

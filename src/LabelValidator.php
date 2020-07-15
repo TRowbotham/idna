@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Rowbot\Idna;
 
+use Normalizer;
 use Rowbot\Idna\CodePointString;
 use Rowbot\Idna\Resource\Regex;
 
@@ -97,7 +98,7 @@ class LabelValidator
         $codePoints = new CodePointString($label);
 
         // Step 1. The label must be in Unicode Normalization Form C.
-        if (!$codePoints->isNormalized()) {
+        if (!Normalizer::isNormalized($label, Normalizer::FORM_C)) {
             $this->info->addError(Idna::ERROR_INVALID_ACE_LABEL);
         }
 

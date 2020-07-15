@@ -27,7 +27,7 @@
     "require": {
         "php": ">=7.1",
         "rowbot/punycode": "^1.0",
-        "symfony/polyfill-intl-normalizer": "^1.15"
+        "symfony/polyfill-intl-normalizer": "^1.18"
     },
     "require-dev": {
         "guzzlehttp/guzzle": "^6.5",

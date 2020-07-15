@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Rowbot\Idna;
 
+use Normalizer;
 use Rowbot\Punycode\Exception\PunycodeException;
 use Rowbot\Punycode\Punycode;
 
@@ -134,8 +135,9 @@ final class Idna
         $domain = self::mapCodePoints($domain, $options, $info);
 
         // Step 2. Normalize the domain name string to Unicode Normalization Form C.
-        $codePoints = new CodePointString($domain);
-        $domain = $codePoints->maybeNormalize();
+        if (!Normalizer::isNormalized($domain, Normalizer::FORM_C)) {
+            $domain = Normalizer::normalize($domain, Normalizer::FORM_C);
+        }
 
         // Step 3. Break the string into labels at U+002E (.) FULL STOP.
         $labels = explode('.', $domain);
