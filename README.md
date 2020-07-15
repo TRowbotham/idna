@@ -19,6 +19,7 @@ Unicode less than 11.0.0 have not been tested.
 * [Requirements](#requirements)
 * [Installation](#installation)
 * [API](#api)
+* [Error Codes](#error-codes)
 * [The WTFs of Unicode Support in PHP](#the-wtfs-of-unicode-support-in-php)
 * [FAQs](#faqs)
 * [Internals](#internals)
@@ -136,6 +137,60 @@ Returns `true` if the input domain name contains a code point that has a status 
 This status indicates that the code points are handled differently in IDNA2003 than they are in
 IDNA2008. At the time of writing, there are only 4 code points that have this status. They are
 U+00DF, U+03C2, U+200C, and U+200D.
+
+## Error Codes
+
+* `Idna::ERROR_EMPTY_LABEL`
+
+  The domain name or one of it's labels are an empty string.
+
+* `Idna::ERROR_LABEL_TOO_LONG`
+
+  One of the domain's labels exceeds 63 bytes.
+
+* `Idna::ERROR_DOMAIN_NAME_TOO_LONG`
+
+  The length of the domain name exceeds 253 bytes.
+
+* `Idna::ERROR_LEADING_HYPHEN`
+
+  One of the domain name's labels starts with a hyphen-minus character (-).
+
+* `Idna::ERROR_TRAILING_HYPHEN`
+
+  One of the domain name's labels ends with a hyphen-minus character (-).
+
+* `Idna::ERROR_HYPHEN_3_4`
+
+  One of the domain name's labels contains a hyphen-minus character in the 3rd and 4th position.
+
+* `Idna::ERROR_LEADING_COMBINING_MARK`
+
+  One of the domain name's labels starts with a combining mark.
+
+* `Idna::ERROR_DISALLOWED`
+
+  The domain name contains characters that are disallowed.
+
+* `Idna::ERROR_PUNYCODE`
+
+  One of the domain name's labels starts with "xn--", but is not valid punycode.
+
+* `Idna::ERROR_LABEL_HAS_DOT`
+
+  One of the domain name's labels contains a full stop character (.).
+
+* `Idna::ERROR_INVALID_ACE_LABEL`
+
+  One of the domain name's labels is an invalid ACE label.
+
+* `Idna::ERROR_BIDI`
+
+  The domain name does not meet the BiDi requirements for IDNA.
+
+* `Idna::ERROR_CONTEXTJ`
+
+  One of the domain name's labels does not meet the CONTEXTJ requirements for IDNA.
 
 ## The WTFs of Unicode Support in PHP
 
