@@ -65,14 +65,13 @@ final class Idna
      */
     private static function mapCodePoints(string $domain, array $options, DomainInfo $info): string
     {
-        $codePoints = new CodePointString($domain);
         $str = '';
         $useSTD3ASCIIRules = $options['UseSTD3ASCIIRules'];
         $transitional = $options['Transitional_Processing'];
         $errors = 0;
         $transitionalDifferent = false;
 
-        foreach ($codePoints as $codePoint) {
+        foreach (CodePoint::utf8Decode($domain) as $codePoint) {
             $data = CodePointStatus::lookup($codePoint, $useSTD3ASCIIRules);
 
             switch ($data['status']) {

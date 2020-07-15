@@ -18,8 +18,6 @@ use const PREG_OFFSET_CAPTURE;
 
 class LabelValidator
 {
-    private const HYPHEN = 0x002D;
-
     /**
      * @var \Rowbot\Idna\DomainInfo
      */
@@ -39,7 +37,7 @@ class LabelValidator
         }
     }
 
-    protected function isValidContextJ(string $label, CodePointString $codePoints): bool
+    protected function isValidContextJ(string $label, array $codePoints): bool
     {
         $offset = 0;
 
@@ -48,14 +46,14 @@ class LabelValidator
                 continue;
             }
 
-            $prev = $codePoints->codePointAt($i - 1);
+            $prev = $i - 1;
 
-            if ($prev === null) {
+            if (!isset($codePoints[$prev])) {
                 return false;
             }
 
             // If Canonical_Combining_Class(Before(cp)) .eq. Virama Then True;
-            if (isset(self::$virama[$prev])) {
+            if (isset(self::$virama[$codePoints[$prev]])) {
                 continue;
             }
 
@@ -95,7 +93,7 @@ class LabelValidator
             return;
         }
 
-        $codePoints = new CodePointString($label);
+        $codePoints = CodePoint::utf8Decode($label);
 
         // Step 1. The label must be in Unicode Normalization Form C.
         if (!Normalizer::isNormalized($label, Normalizer::FORM_C)) {
@@ -105,10 +103,7 @@ class LabelValidator
         if ($options['CheckHyphens']) {
             // Step 2. If CheckHyphens, the label must not contain a U+002D HYPHEN-MINUS character
             // in both the thrid and fourth positions.
-            if (
-                $codePoints->codePointAt(2) === self::HYPHEN
-                && $codePoints->codePointAt(3) === self::HYPHEN
-            ) {
+            if (isset($codePoints[3]) && $codePoints[2] === 0x2D && $codePoints[3] === 0x2D) {
                 $this->info->addError(Idna::ERROR_HYPHEN_3_4);
             }
 

@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Rowbot\Idna\Bin\IdnaDataBuilder;
-use Rowbot\Idna\Bin\NormalizationDataBuilder;
 use Rowbot\Idna\Bin\RegexBuilder;
 use Rowbot\Idna\Bin\ViramaDataBuilder;
 
