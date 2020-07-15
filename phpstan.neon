@@ -9,10 +9,7 @@ parameters:
         - bin
 
     ignoreErrors:
-        -
-            message: '#Parameter \#2 \$form of static method Normalizer::normalize\(\) expects int, string given\.#'
-            path: src/CodePointString.php
-            count: 2
+        - '#Parameter \#2 \$form of static method Normalizer::(isNormalized|normalize)\(\) expects int, string given\.#'
 
         # This error can safely be ignored as we do these checks when building the data files.
         -

@@ -37,6 +37,9 @@ class LabelValidator
         }
     }
 
+    /**
+     * @param list<int> $codePoints
+     */
     protected function isValidContextJ(string $label, array $codePoints): bool
     {
         $offset = 0;

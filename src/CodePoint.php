@@ -53,7 +53,7 @@ final class CodePoint
      *
      * @see https://encoding.spec.whatwg.org/#utf-8-decoder
      *
-     * @return array<int, int>
+     * @return list<int>
      */
     public static function utf8Decode(string $input): array
     {
