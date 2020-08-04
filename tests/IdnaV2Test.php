@@ -110,11 +110,10 @@ class IdnaV2Test extends IdnaV2TestCase
             $toAsciiT,
             $toAsciiTStatus,
         ] = $this->translate($source, $toUnicode, $toUnicodeStatus, $toAsciiN, $toAsciiNStatus, $toAsciiT, $toAsciiTStatus);
-
         $result = Idna::toAscii($source, self::DEFAULT_OPTIONS);
-        self::assertSame($toAsciiN, $result->getDomain());
 
         if ($toAsciiNStatus === []) {
+            self::assertSame($toAsciiN, $result->getDomain());
             self::assertFalse($result->hasErrors(), sprintf(
                 'Expected no errors, but found %s.',
                 $this->containedErrors($result->getErrors())
@@ -149,7 +148,6 @@ class IdnaV2Test extends IdnaV2TestCase
         ] = $this->translate($source, $toUnicode, $toUnicodeStatus, $toAsciiN, $toAsciiNStatus, $toAsciiT, $toAsciiTStatus);
         $options = self::DEFAULT_OPTIONS;
         $options['Transitional_Processing'] = true;
-
         $result = Idna::toAscii($source, $options);
 
         // There is currently a bug in the test data, where it is expected that the following 2
@@ -161,9 +159,8 @@ class IdnaV2Test extends IdnaV2TestCase
             $toAsciiT = '';
         }
 
-        self::assertSame($toAsciiT, $result->getDomain());
-
         if ($toAsciiTStatus === []) {
+            self::assertSame($toAsciiT, $result->getDomain());
             self::assertFalse($result->hasErrors(), sprintf(
                 'Expected no errors, but found %s.',
                 $this->containedErrors($result->getErrors())

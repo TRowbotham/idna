@@ -186,14 +186,8 @@ final class Idna
         $labels = self::process($domain, $options, $info);
 
         foreach ($labels as $i => $label) {
-            // Only convert labels to punycode that contain non-ASCII code points and only if that
-            // label does not contain a character from the gen-delims set specified in
-            // {@link https://ietf.org/rfc/rfc3987.html#section-2.2}
+            // Only convert labels to punycode that contain non-ASCII code points
             if (preg_match('/[^\x00-\x7F]/', $label) === 1) {
-                if (strpbrk($label, ':/?#[]@') !== false) {
-                    continue;
-                }
-
                 try {
                     $label = 'xn--' . Punycode::encode($label);
                 } catch (PunycodeException $e) {

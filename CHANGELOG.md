@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+* Fix bug with domain names containing a URL delimiter
+
 ## [0.1.2] - 2020-07-15
 
 ### Added
