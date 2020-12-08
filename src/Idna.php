@@ -135,7 +135,17 @@ final class Idna
 
         // Step 2. Normalize the domain name string to Unicode Normalization Form C.
         if (!Normalizer::isNormalized($domain, Normalizer::FORM_C)) {
+            $originalDomain = $domain;
             $domain = Normalizer::normalize($domain, Normalizer::FORM_C);
+
+            // This shouldn't be possible since the input string is run through the UTF-8 decoder
+            // when mapping the code points above, but lets account for it anyway.
+            if ($domain === false) {
+                $info->addError(self::ERROR_INVALID_ACE_LABEL);
+                $domain = $originalDomain;
+            }
+
+            unset($originalDomain);
         }
 
         // Step 3. Break the string into labels at U+002E (.) FULL STOP.
