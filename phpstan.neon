@@ -7,8 +7,13 @@ parameters:
     paths:
         - src
         - bin
+    
+    # Temporarily disable reporting unmatched errors to get get around differing method signatures in PHP 7 vs PHP 8
+    reportUnmatchedIgnoredErrors: false
 
     ignoreErrors:
+        - '#Strict comparison using === between string and false will always evaluate to false\.#'
+
         # This error can safely be ignored as we do these checks when building the data files.
         -
             message: "#Offset 'mapping' does not exist on array\\('status' => string, \\?'mapping' => string\\)\\.#"
