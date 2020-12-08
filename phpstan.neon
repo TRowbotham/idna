@@ -9,8 +9,6 @@ parameters:
         - bin
 
     ignoreErrors:
-        - '#Parameter \#2 \$form of static method Normalizer::(isNormalized|normalize)\(\) expects int, string given\.#'
-
         # This error can safely be ignored as we do these checks when building the data files.
         -
             message: "#Offset 'mapping' does not exist on array\\('status' => string, \\?'mapping' => string\\)\\.#"
