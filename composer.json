@@ -30,8 +30,8 @@
         "symfony/polyfill-intl-normalizer": "^1.18"
     },
     "require-dev": {
-        "guzzlehttp/guzzle": "^6.5",
-        "phpstan/phpstan": "^0.12.20",
+        "guzzlehttp/guzzle": "^6.5 || ^7.0",
+        "phpstan/phpstan": "^0.12.60",
         "phpstan/phpstan-deprecation-rules": "^0.12.2",
         "phpstan/phpstan-strict-rules": "^0.12.2",
         "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0",
