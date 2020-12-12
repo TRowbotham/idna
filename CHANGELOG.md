@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+* Test on PHP 8 release
+
+### Fixed
+
+* Handle the rare possibility that string nomalization can fail
+
 ## [0.1.3] - 2020-08-03
 
 ### Fixed
