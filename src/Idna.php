@@ -14,7 +14,6 @@ use function explode;
 use function implode;
 use function preg_match;
 use function strlen;
-use function strpbrk;
 
 /**
  * @see https://www.unicode.org/reports/tr46/
