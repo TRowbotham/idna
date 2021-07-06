@@ -13,7 +13,9 @@ use function count;
 use function explode;
 use function implode;
 use function preg_match;
+use function strncmp;
 use function strlen;
+use function substr;
 
 /**
  * @see https://www.unicode.org/reports/tr46/
@@ -156,7 +158,7 @@ final class Idna
         foreach ($labels as $i => $label) {
             $validationOptions = $options;
 
-            if (substr($label, 0, 4) === 'xn--') {
+            if (strncmp($label, 'xn--', 4) === 0) {
                 try {
                     $label = Punycode::decode(substr($label, 4));
                 } catch (PunycodeException $e) {

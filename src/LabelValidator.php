@@ -112,11 +112,11 @@ class LabelValidator
 
             // Step 3. If CheckHyphens, the label must neither begin nor end with a U+002D
             // HYPHEN-MINUS character.
-            if (substr($label, 0, 1) === '-') {
+            if (strncmp($label, '-', 1) === 0) {
                 $this->info->addError(Idna::ERROR_LEADING_HYPHEN);
             }
 
-            if (substr($label, -1, 1) === '-') {
+            if (substr_compare($label, '-', -1) === 0) {
                 $this->info->addError(Idna::ERROR_TRAILING_HYPHEN);
             }
         }

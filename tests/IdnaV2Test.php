@@ -11,7 +11,7 @@ use function array_filter;
 use function array_flip;
 use function is_array;
 use function sprintf;
-use function substr;
+use function strncmp;
 
 use const ARRAY_FILTER_USE_KEY;
 
@@ -39,7 +39,7 @@ class IdnaV2Test extends IdnaV2TestCase
 
         $reflection = new ReflectionClass(Idna::class);
         $errors = array_filter($reflection->getConstants(), static function (string $name): bool {
-            return substr($name, 0, 6) === 'ERROR_';
+            return strncmp($name, 'ERROR_', 6) === 0;
         }, ARRAY_FILTER_USE_KEY);
         self::$errorMap = array_flip($errors);
     }
