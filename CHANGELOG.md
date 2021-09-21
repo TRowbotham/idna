@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+* Update data files to Unicode 14
+
 ## [0.1.4] - 2021-02-11
 
 ### Added

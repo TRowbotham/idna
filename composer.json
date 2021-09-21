@@ -40,7 +40,7 @@
     },
     "extra": {
         "idna": {
-            "unicode_version": "13.0.0"
+            "unicode_version": "14.0.0"
         }
     }
 }
