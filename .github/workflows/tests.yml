@@ -51,6 +51,7 @@ jobs:
         with:
           path: ${{ env.test-data-files }}
           key: unicode-test-data-${{ hashFiles(env.test-data-files) }}
+          restore-keys: unicode-test-data-
 
       - name: Install dependencies
         run: composer install
