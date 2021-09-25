@@ -102,6 +102,15 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
+      - name: Cache test data
+        uses: actions/cache@v2
+        env:
+          test-data-files: tests/data/unicode-idna-test-data
+        with:
+          path: ${{ env.test-data-files }}
+          key: unicode-test-data-${{ hashFiles(env.test-data-files) }}
+          restore-keys: unicode-test-data-
+
       - name: Install dependencies
         run: composer install
 
@@ -148,6 +157,15 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
+      - name: Cache test data
+        uses: actions/cache@v2
+        env:
+          test-data-files: tests/data/unicode-idna-test-data
+        with:
+          path: ${{ env.test-data-files }}
+          key: unicode-test-data-${{ hashFiles(env.test-data-files) }}
+          restore-keys: unicode-test-data-
+
       - name: Install dependencies
         run: composer install --ignore-platform-reqs
 
@@ -179,6 +197,15 @@ jobs:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
+
+      - name: Cache test data
+        uses: actions/cache@v2
+        env:
+          test-data-files: tests/data/unicode-idna-test-data
+        with:
+          path: ${{ env.test-data-files }}
+          key: unicode-test-data-${{ hashFiles(env.test-data-files) }}
+          restore-keys: unicode-test-data-
 
       - name: Install dependencies
         run: composer install
@@ -227,6 +254,15 @@ jobs:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
+
+      - name: Cache test data
+        uses: actions/cache@v2
+        env:
+          test-data-files: tests/data/unicode-idna-test-data
+        with:
+          path: ${{ env.test-data-files }}
+          key: unicode-test-data-${{ hashFiles(env.test-data-files) }}
+          restore-keys: unicode-test-data-
 
       - name: Install dependencies
         run: composer install
