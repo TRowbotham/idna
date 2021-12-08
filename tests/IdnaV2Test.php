@@ -49,7 +49,7 @@ class IdnaV2Test extends IdnaV2TestCase
      */
     public function getData(): array
     {
-        return $this->loadTestData(self::getUnicodeVersion());
+        return $this->loadTestData(Idna::UNICODE_VERSION);
     }
 
     /**

@@ -14,11 +14,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use function array_map;
 use function count;
 use function explode;
-use function file_get_contents;
 use function in_array;
-use function json_decode;
-use function json_last_error_msg;
-use function json_last_error;
 use function preg_last_error;
 use function preg_match_all;
 use function sprintf;
@@ -70,36 +66,6 @@ class IdnaV2TestCase extends TestCase
     private const TEST_FILE = 'IdnaTestV2.txt';
     private const CACHE_TTL = 86400 * 7; // 7 DAYS
     private const TEST_DATA_DIR = __DIR__ . DIRECTORY_SEPARATOR . 'data';
-
-    /**
-     * @var string
-     */
-    private static $unicodeVersion;
-
-    public static function getUnicodeVersion(): string
-    {
-        if (isset(self::$unicodeVersion)) {
-            return self::$unicodeVersion;
-        }
-
-        $data = file_get_contents(
-            __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'composer.json'
-        );
-
-        if ($data === false) {
-            throw new RuntimeException();
-        }
-
-        $composerConfig = json_decode($data);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new RuntimeException(json_last_error_msg());
-        }
-
-        self::$unicodeVersion = $composerConfig->extra->idna->unicode_version;
-
-        return self::$unicodeVersion;
-    }
 
     /**
      * @return array<int, array<int, string>>

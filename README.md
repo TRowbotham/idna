@@ -38,6 +38,10 @@ composer require rowbot/idna
 
 ## API
 
+### Idna::UNICODE_VERSION
+
+The Unicode version of the data files used, as a string.
+
 ### Idna::toAscii(string $domain, array $options = []): IdnaResult
 
 Converts a domain name to its ASCII form. Anytime an error is recorded while doing an ASCII
@@ -318,17 +322,14 @@ inside in invalid domains, but your implementation doesn't?**
 ### Building
 
 Unicode data files are fetched from https://www.unicode.org/Public. Currently, Unicode version
-11.0.0-13.0.0 are supported. To change the version of Unicode that the library is built with, you
-must first change the value in the `composer.json` file, like so:
+11.0.0-14.0.0 are supported. To change the version of Unicode that the library is built with, you
+must first change the value of the `\Rowbot\Idna::UNICODE_VERSION` constant, like so:
 
-```json
+```diff
+class Idna
 {
-  "extra": {
-    "idna": {
-      "unicode_version": "12.1.0"
-    }
-  }
-}
+-     public const UNICODE_VERSION = '13.0.0';
++     public const UNICODE_VERSION = '14.0.0';
 ```
 
 Then to generate the necessary data files, you execute the following command:

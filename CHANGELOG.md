@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+* Add `UNICODE_VERSION` constant to `Idna` class that returns a string with the Unicode version of the data files used
+
 ### Changed
 
 * Update data files to Unicode 14
