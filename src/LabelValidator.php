@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace Rowbot\Idna;
 
 use Normalizer;
-use Rowbot\Idna\CodePointString;
 use Rowbot\Idna\Resource\Regex;
 
 use function preg_match;
 use function strlen;
 use function strpos;
-use function substr;
 
 use const DIRECTORY_SEPARATOR as DS;
 use const PREG_OFFSET_CAPTURE;
@@ -26,13 +24,13 @@ class LabelValidator
     /**
      * @var array<int, int>
      */
-    protected static $virama;
+    protected static $virama = [];
 
     public function __construct(DomainInfo $info)
     {
         $this->info = $info;
 
-        if (!isset(self::$virama)) {
+        if (self::$virama === []) {
             self::$virama = require __DIR__ . DS . '..' . DS . 'resources' . DS . 'virama.php';
         }
     }

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Rowbot\Idna\Bin;
 
 use function array_filter;
+use function assert;
 use function file_put_contents;
 use function in_array;
+use function is_array;
 use function sprintf;
 
 use const DIRECTORY_SEPARATOR as DS;
@@ -184,13 +186,15 @@ RegexClass;
     }
 
     /**
-     * @param array<int, array> $data
+     * @param array<int, array<int, array<int, int>|string>> $data
      */
     private static function buildCharacterClass(array $data): string
     {
         $out = '';
 
         foreach ($data as $codePoints) {
+            assert(is_array($codePoints[0]));
+
             if ($codePoints[0][0] !== $codePoints[0][1]) {
                 $out .= sprintf('\x{%04X}-\x{%04X}', ...$codePoints[0]);
 
