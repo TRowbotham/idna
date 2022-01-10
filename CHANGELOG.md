@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.1.5] - 2022-01-10
+
 ### Added
 
 * Add `UNICODE_VERSION` constant to `Idna` class that returns a string with the Unicode version of the data files used
@@ -9,6 +11,7 @@
 ### Changed
 
 * Update data files to Unicode 14
+* Update PHPStan to 1.0
 
 ## [0.1.4] - 2021-02-11
 
