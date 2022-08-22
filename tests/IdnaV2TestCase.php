@@ -7,6 +7,7 @@ namespace Rowbot\Idna\Test;
 use GuzzleHttp\Client;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Rowbot\Idna\CodePoint;
 use Rowbot\Idna\Idna;
 use RuntimeException;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -118,8 +119,20 @@ class IdnaV2TestCase extends TestCase
             }
 
             [$data] = explode('#', $line);
-            $columns = array_map('\trim', explode(';', $data));
+            $columns = array_map('trim', explode(';', $data));
             assert(count($columns) === 7);
+            $columns = preg_replace_callback(
+                '/\\\\(?:u([[:xdigit:]]{4})|x{([[:xdigit:]]{4})})/u',
+                static function (array $matches): string {
+                    return CodePoint::encode(hexdec($matches[1]));
+                },
+                $columns
+            );
+
+            if ($columns === null) {
+                throw new RuntimeException('Failed to unescape unicode characters.');
+            }
+
             $output[] = $columns;
         }
 

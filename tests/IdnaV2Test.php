@@ -150,15 +150,6 @@ class IdnaV2Test extends IdnaV2TestCase
         $options['Transitional_Processing'] = true;
         $result = Idna::toAscii($source, $options);
 
-        // There is currently a bug in the test data, where it is expected that the following 2
-        // source strings result in an empty string. However, due to the way the test files are setup
-        // it currently isn't possible to represent an empty string as an expected value. So, we
-        // skip these 2 problem tests. I have notified the Unicode Consortium about this and they
-        // have passed the information along to the spec editors.
-        if ($source === "\u{200C}" || $source === "\u{200D}") {
-            $toAsciiT = '';
-        }
-
         if ($toAsciiTStatus === []) {
             self::assertSame($toAsciiT, $result->getDomain());
             self::assertFalse($result->hasErrors(), sprintf(
