@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+* Update data files to Unicode 15
+
 ## [0.1.5] - 2022-01-10
 
 ### Added
