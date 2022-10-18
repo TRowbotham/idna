@@ -218,7 +218,7 @@ jobs:
           vendor/bin/phpunit --coverage-clover ./build/coverage/clover.xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./build/coverage/clover.xml
