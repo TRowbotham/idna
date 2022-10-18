@@ -69,7 +69,7 @@ final class CodePoint
             $byte = ord($input[$i]);
 
             if ($bytesNeeded === 0) {
-                if ($byte >= 0x00 && $byte <= 0x7F) {
+                if ($byte <= 0x7F) {
                     $codePoints[] = $byte;
 
                     continue;
