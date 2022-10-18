@@ -100,7 +100,7 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 69298 && $codePoint <= 69375) {
+        if ($codePoint >= 69298 && $codePoint <= 69372) {
             return true;
         }
 
@@ -108,7 +108,7 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 70207 && $codePoint <= 70271) {
+        if ($codePoint >= 70210 && $codePoint <= 70271) {
             return true;
         }
 
@@ -140,7 +140,7 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 72441 && $codePoint <= 72703) {
+        if ($codePoint >= 72458 && $codePoint <= 72703) {
             return true;
         }
 
@@ -152,7 +152,7 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 73465 && $codePoint <= 73647) {
+        if ($codePoint >= 73562 && $codePoint <= 73647) {
             return true;
         }
 
@@ -164,7 +164,7 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 78905 && $codePoint <= 82943) {
+        if ($codePoint >= 78934 && $codePoint <= 82943) {
             return true;
         }
 
@@ -192,10 +192,6 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 110883 && $codePoint <= 110927) {
-            return true;
-        }
-
         if ($codePoint >= 111356 && $codePoint <= 113663) {
             return true;
         }
@@ -208,7 +204,7 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 119366 && $codePoint <= 119519) {
+        if ($codePoint >= 119366 && $codePoint <= 119487) {
             return true;
         }
 
@@ -220,11 +216,15 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 122655 && $codePoint <= 122879) {
+        if ($codePoint >= 122667 && $codePoint <= 122879) {
             return true;
         }
 
-        if ($codePoint >= 122923 && $codePoint <= 123135) {
+        if ($codePoint >= 122990 && $codePoint <= 123022) {
+            return true;
+        }
+
+        if ($codePoint >= 123024 && $codePoint <= 123135) {
             return true;
         }
 
@@ -232,7 +232,11 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 123648 && $codePoint <= 124895) {
+        if ($codePoint >= 123648 && $codePoint <= 124111) {
+            return true;
+        }
+
+        if ($codePoint >= 124154 && $codePoint <= 124895) {
             return true;
         }
 
@@ -292,7 +296,7 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 201547 && $codePoint <= 262141) {
+        if ($codePoint >= 205744 && $codePoint <= 262141) {
             return true;
         }
 

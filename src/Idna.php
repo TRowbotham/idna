@@ -22,7 +22,7 @@ use function substr;
  */
 final class Idna
 {
-    public const UNICODE_VERSION = '14.0.0';
+    public const UNICODE_VERSION = '15.0.0';
 
     private const DEFAULT_UNICODE_OPTIONS = [
         'CheckHyphens'            => true,
