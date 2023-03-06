@@ -71,44 +71,29 @@ class IdnaV2TestCase extends TestCase
     /**
      * @return array<int, array<int, string>>
      */
-    public function loadTestData(string $version): array
+    public static function loadTestData(string $version): array
     {
         $cache = new FilesystemAdapter(
             'unicode-idna-test-data',
             self::CACHE_TTL,
             self::TEST_DATA_DIR
         );
-        $testData = $cache->getItem($version);
 
-        if ($testData->isHit()) {
-            return $testData->get();
-        }
+        return $cache->get($version, static function () use ($version): array {
+            $client = new Client([
+                'base_uri' => self::BASE_URI,
+                'http_errors' => true,
+            ]);
+            $response = $client->get($version . '/' . self::TEST_FILE);
 
-        $client = new Client([
-            'base_uri' => self::BASE_URI
-        ]);
-        $response = $client->request('GET', $version . '/' . self::TEST_FILE);
-
-        if ($response->getStatusCode() >= 400) {
-            throw new RuntimeException(sprintf(
-                'Got status code %d trying to retrieve %s for Unicode version %s.',
-                $response->getStatusCode(),
-                self::TEST_FILE,
-                $version
-            ));
-        }
-
-        $data = $this->processResponse($response);
-        $testData->set($data);
-        $cache->save($testData);
-
-        return $data;
+            return self::processResponse($response);
+        });
     }
 
     /**
      * @return array<int, array<int, string>>
      */
-    private function processResponse(ResponseInterface $response): array
+    private static function processResponse(ResponseInterface $response): array
     {
         $output = [];
 
