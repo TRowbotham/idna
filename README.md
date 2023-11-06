@@ -11,10 +11,8 @@ as Unicode IDNA Compatibility Processing. You can read more about the difference
 IDNA2008, and UTS#46 in [Section 7. IDNA Comparison](https://www.unicode.org/reports/tr46/#IDNAComparison)
 of the specification.
 
-This library currently ships with Unicode 15.0.0 support and implements Version 15.0.0, Revision 29 of IDNA Compatibility
-Processing. It has the ability to use Unicode 11.0.0 to Unicode 15.0.0. While this library likely supports versions of
-Unicode less than 11.0.0, the format of the Unicode test files were changed beginning in 11.0.0 and as a result, versions
-of Unicode less than 11.0.0 have not been tested.
+This library currently ships with Unicode 15.1.0 support and implements Version 15.1.0, Revision 31 of IDNA Compatibility
+Processing.
 
 * [Requirements](#requirements)
 * [Installation](#installation)
@@ -64,6 +62,7 @@ options include:
   * `"Transitional_Processing"` - Whether transitional or non-transitional processing is used. When
   enabled, processing behaves more like IDNA2003 and when disabled behaves like IDNA2008. Defaults
   to false, which means that non-transitional processing is used by default.
+  * `"IgnoreInvalidPunycode"` - Allows for an all-ASCII fast-path.
   * `"VerifyDnsLength"` - Validates the length of the domain name string and it's individual labels.
   Defaults to true.
 
@@ -257,6 +256,7 @@ So... WTF?
     'CheckJoiners'            => true,
     'UseSTD3ASCIIRules'       => true,
     'Transitional_Processing' => false,
+    'IgnoreInvalidPunycode'   => false,
     'VerifyDnsLength'         => true, // Only for Idna::toAscii()
   ];
   ```
@@ -322,7 +322,7 @@ inside in invalid domains, but your implementation doesn't?**
 ### Building
 
 Unicode data files are fetched from https://www.unicode.org/Public. Currently, Unicode version
-11.0.0-15.0.0 are supported. To change the version of Unicode that the library is built with, you
+15.1.0-15.1.0 are supported. To change the version of Unicode that the library is built with, you
 must first change the value of the `\Rowbot\Idna::UNICODE_VERSION` constant, like so:
 
 ```diff

@@ -117,6 +117,8 @@ class LabelValidator
             if (substr_compare($label, '-', -1) === 0) {
                 $this->info->addError(Idna::ERROR_TRAILING_HYPHEN);
             }
+        } elseif (strncmp($label, 'xn--', 4) === 0) {
+            $this->info->addError(Idna::ERROR_PUNYCODE);
         }
 
         // Step 4. The label must not contain a U+002E (.) FULL STOP.

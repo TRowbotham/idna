@@ -2,9 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+* New option `IgnoreInvalidPunycode` that when set to `true` enables an ASCII fast-path.
+
 ### Changed
 
-* Update data files to Unicode 15
+* Update data files to Unicode 15.1.0
+* Setting `Transitional_Processing` to `true` now emits a deprecation notice.
 
 ## [0.1.5] - 2022-01-10
 

@@ -16,19 +16,23 @@ use function preg_match;
 use function strncmp;
 use function strlen;
 use function substr;
+use function trigger_error;
+
+use const E_USER_DEPRECATED;
 
 /**
  * @see https://www.unicode.org/reports/tr46/
  */
 final class Idna
 {
-    public const UNICODE_VERSION = '15.0.0';
+    public const UNICODE_VERSION = '15.1.0';
 
     private const DEFAULT_UNICODE_OPTIONS = [
         'CheckHyphens'            => true,
         'CheckBidi'               => true,
         'CheckJoiners'            => true,
         'UseSTD3ASCIIRules'       => true,
+        'IgnoreInvalidPunycode'   => false,
         'Transitional_Processing' => false,
     ];
     private const DEFAULT_ASCII_OPTIONS = self::DEFAULT_UNICODE_OPTIONS + [
@@ -71,7 +75,6 @@ final class Idna
         $str = '';
         $useSTD3ASCIIRules = $options['UseSTD3ASCIIRules'];
         $transitional = $options['Transitional_Processing'];
-        $errors = 0;
         $transitionalDifferent = false;
 
         foreach (CodePoint::utf8Decode($domain) as $codePoint) {
@@ -79,10 +82,6 @@ final class Idna
 
             switch ($data['status']) {
                 case 'disallowed':
-                    $errors |= Idna::ERROR_DISALLOWED;
-
-                    // no break.
-
                 case 'valid':
                     $str .= CodePoint::encode($codePoint);
 
@@ -93,7 +92,7 @@ final class Idna
                     break;
 
                 case 'mapped':
-                    $str .= $data['mapping'];
+                    $str .= ($transitional && $codePoint === 0x1E9E ? 'ss' : $data['mapping']);
 
                     break;
 
@@ -104,8 +103,6 @@ final class Idna
                     break;
             }
         }
-
-        $info->addError($errors);
 
         if ($transitionalDifferent) {
             $info->setTransitionalDifferent();
@@ -123,6 +120,10 @@ final class Idna
      */
     private static function process(string $domain, array $options, DomainInfo $info): array
     {
+        if ($options['Transitional_Processing']) {
+            trigger_error('Setting Transitional_Processing to true is deprecated.', E_USER_DEPRECATED);
+        }
+
         // If VerifyDnsLength is not set, we are doing ToUnicode otherwise we are doing ToASCII and
         // we need to respect the VerifyDnsLength option.
         $checkForEmptyLabels = !isset($options['VerifyDnsLength']) || $options['VerifyDnsLength'];
@@ -161,10 +162,24 @@ final class Idna
             $validationOptions = $options;
 
             if (strncmp($label, 'xn--', 4) === 0) {
+                // Step 4.1. If the label contains any non-ASCII code point (i.e., a code point greater than U+007F),
+                // record that there was an error, and continue with the next label.
+                if (preg_match('/[^\x00-\x7F]/', $label) === 1) {
+                    $info->addError(self::ERROR_PUNYCODE);
+
+                    continue;
+                }
+
+                // Step 4.2. Attempt to convert the rest of the label to Unicode according to Punycode [RFC3492]. If
+                // that conversion fails and if not IgnoreInvalidPunycode, record that there was an error, and continue
+                // with the next label. Otherwise replace the original label in the string by the results of the
+                // conversion.
                 try {
                     $label = Punycode::decode(substr($label, 4));
                 } catch (PunycodeException $e) {
-                    $info->addError(self::ERROR_PUNYCODE);
+                    if (!$validationOptions['IgnoreInvalidPunycode']) {
+                        $info->addError(self::ERROR_PUNYCODE);
+                    }
 
                     continue;
                 }
