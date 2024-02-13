@@ -148,6 +148,7 @@ class IdnaV2Test extends IdnaV2TestCase
         ] = $this->translate($source, $toUnicode, $toUnicodeStatus, $toAsciiN, $toAsciiNStatus, $toAsciiT, $toAsciiTStatus);
         $options = self::DEFAULT_OPTIONS;
         $options['Transitional_Processing'] = true;
+        $this->registerDeprecationHandler();
         $result = Idna::toAscii($source, $options);
 
         if ($toAsciiTStatus === []) {
@@ -245,5 +246,14 @@ class IdnaV2Test extends IdnaV2TestCase
         }
 
         return false;
+    }
+
+    private function registerDeprecationHandler(): void
+    {
+        set_error_handler(static function ($errno, $errstr, $errfile, $errline): bool {
+            restore_error_handler();
+
+            return true;
+        }, E_USER_DEPRECATED);
     }
 }
