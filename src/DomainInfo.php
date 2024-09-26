@@ -6,25 +6,16 @@ namespace Rowbot\Idna;
 
 class DomainInfo
 {
-    /**
-     * @var bool
-     */
-    protected $bidiDomain;
+    protected bool $bidiDomain;
 
     /**
-     * @var int
+     * @var int-mask-of<\Rowbot\Idna\Idna::ERROR_*>
      */
-    protected $errors;
+    protected int $errors;
 
-    /**
-     * @var bool
-     */
-    protected $validBidiDomain;
+    protected bool $validBidiDomain;
 
-    /**
-     * @var bool
-     */
-    protected $transitionalDifferent;
+    protected bool $transitionalDifferent;
 
     public function __construct()
     {

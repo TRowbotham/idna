@@ -9,17 +9,14 @@ class IdnaResult
     /**
      * @var string
      */
-    protected $domain;
+    protected string $domain;
 
     /**
-     * @var int
+     * @var int-mask-of<\Rowbot\Idna\Idna::ERROR_*>
      */
-    protected $errors;
+    protected int $errors;
 
-    /**
-     * @var bool
-     */
-    protected $transitionalDifferent;
+    protected bool $transitionalDifferent;
 
     public function __construct(string $domain, DomainInfo $info)
     {

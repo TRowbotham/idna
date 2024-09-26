@@ -4,4 +4,4 @@ composer.lock
 /.vscode/
 /build/
 /tests/data/
-.phpunit.result.cache
+.phpunit.cache

@@ -9,7 +9,9 @@ use Rowbot\Idna\Resource\Regex;
 
 use function preg_match;
 use function strlen;
-use function strpos;
+use function str_contains;
+use function str_ends_with;
+use function str_starts_with;
 
 use const DIRECTORY_SEPARATOR as DS;
 use const PREG_OFFSET_CAPTURE;
@@ -110,19 +112,19 @@ class LabelValidator
 
             // Step 3. If CheckHyphens, the label must neither begin nor end with a U+002D
             // HYPHEN-MINUS character.
-            if (strncmp($label, '-', 1) === 0) {
+            if (str_starts_with($label, '-')) {
                 $this->info->addError(Idna::ERROR_LEADING_HYPHEN);
             }
 
-            if (substr_compare($label, '-', -1) === 0) {
+            if (str_ends_with($label, '-')) {
                 $this->info->addError(Idna::ERROR_TRAILING_HYPHEN);
             }
-        } elseif (strncmp($label, 'xn--', 4) === 0) {
+        } elseif (str_starts_with($label, 'xn--')) {
             $this->info->addError(Idna::ERROR_PUNYCODE);
         }
 
         // Step 4. The label must not contain a U+002E (.) FULL STOP.
-        if (strpos($label, '.') !== false) {
+        if (str_contains($label, '.')) {
             $this->info->addError(Idna::ERROR_LABEL_HAS_DOT);
         }
 
