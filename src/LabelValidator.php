@@ -7,6 +7,7 @@ namespace Rowbot\Idna;
 use Normalizer;
 use Rowbot\Idna\Resource\Regex;
 
+use function ord;
 use function preg_match;
 use function strlen;
 use function str_contains;
@@ -83,13 +84,10 @@ class LabelValidator
      *
      * @param array<string, bool> $options
      */
-    public function validate(string $label, array $options, bool $canBeEmpty): void
+    public function validate(string $label, array $options, bool $isRootLabel): void
     {
         if ($label === '') {
-            if (
-                !$canBeEmpty
-                && (!isset($options['VerifyDnsLength']) || $options['VerifyDnsLength'])
-            ) {
+            if (!$isRootLabel && !isset($options['VerifyDnsLength'])) {
                 $this->info->addError(Idna::ERROR_EMPTY_LABEL);
             }
 
@@ -119,46 +117,62 @@ class LabelValidator
             if (str_ends_with($label, '-')) {
                 $this->info->addError(Idna::ERROR_TRAILING_HYPHEN);
             }
+
+        // Step 4. If not CheckHyphens, the label must not begin with “xn--”.
         } elseif (str_starts_with($label, 'xn--')) {
             $this->info->addError(Idna::ERROR_PUNYCODE);
         }
 
-        // Step 4. The label must not contain a U+002E (.) FULL STOP.
+        // Step 5. The label must not contain a U+002E (.) FULL STOP.
         if (str_contains($label, '.')) {
             $this->info->addError(Idna::ERROR_LABEL_HAS_DOT);
         }
 
-        // Step 5. The label must not begin with a combining mark, that is: General_Category=Mark.
+        // Step 6. The label must not begin with a combining mark, that is: General_Category=Mark.
         if (preg_match(Regex::COMBINING_MARK, $label, $matches) === 1) {
             $this->info->addError(Idna::ERROR_LEADING_COMBINING_MARK);
         }
 
-        // Step 6. Each code point in the label must only have certain status values according to
+        // Step 7. Each code point in the label must only have certain status values according to
         // Section 5, IDNA Mapping Table:
         $transitional = $options['Transitional_Processing'];
         $useSTD3ASCIIRules = $options['UseSTD3ASCIIRules'];
 
         foreach ($codePoints as $codePoint) {
-            $data = CodePointStatus::lookup($codePoint, $useSTD3ASCIIRules);
+            $data = CodePointStatus::lookup($codePoint);
             $status = $data['status'];
 
-            if ($status === 'valid' || (!$transitional && $status === 'deviation')) {
-                continue;
+            // Step 7.1. For Transitional Processing (deprecated), each value must be valid.
+            // Step 7.2. For Nontransitional Processing, each value must be either valid or deviation.
+            $isValid = $status === 'valid' || (!$transitional && $status === 'deviation');
+
+            // Step 7.3. In addition, if UseSTD3ASCIIRules=true and the code point is an ASCII code point
+            // (U+0000..U+007F), then it must be a lowercase letter (a-z), a digit (0-9), or a hyphen-minus (U+002D).
+            // (Note: This excludes uppercase ASCII A-Z which are mapped in UTS #46 and disallowed in IDNA2008.)
+            if ($useSTD3ASCIIRules && $codePoint >= 0 && $codePoint <= 0x7F) {
+                $isValid = $isValid
+                    && (
+                        $codePoint >= ord('a') && $codePoint <= ord('z')
+                        || $codePoint >= ord('0') && $codePoint <= ord('9')
+                        || $codePoint === ord('-')
+                    );
             }
 
-            $this->info->addError(Idna::ERROR_DISALLOWED);
+            if (!$isValid) {
+                $this->info->addError(Idna::ERROR_DISALLOWED);
 
-            break;
+                break;
+            }
         }
 
-        // Step 7. If CheckJoiners, the label must satisify the ContextJ rules from Appendix A, in
+        // Step 8. If CheckJoiners, the label must satisify the ContextJ rules from Appendix A, in
         // The Unicode Code Points and Internationalized Domain Names for Applications (IDNA)
         // [IDNA2008].
         if ($options['CheckJoiners'] && !$this->isValidContextJ($label, $codePoints)) {
             $this->info->addError(Idna::ERROR_CONTEXTJ);
         }
 
-        // Step 8. If CheckBidi, and if the domain name is a  Bidi domain name, then the label must
+        // Step 9. If CheckBidi, and if the domain name is a  Bidi domain name, then the label must
         // satisfy all six of the numbered conditions in [IDNA2008] RFC 5893, Section 2.
         if (
             $options['CheckBidi']

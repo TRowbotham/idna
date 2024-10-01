@@ -13,7 +13,7 @@ use function count;
 use function explode;
 use function implode;
 use function preg_match;
-use function strncmp;
+use function str_starts_with;
 use function strlen;
 use function substr;
 use function trigger_error;
@@ -25,7 +25,7 @@ use const E_USER_DEPRECATED;
  */
 final class Idna
 {
-    public const UNICODE_VERSION = '15.1.0';
+    public const UNICODE_VERSION = '16.0.0';
 
     private const DEFAULT_UNICODE_OPTIONS = [
         'CheckHyphens'            => true,
@@ -73,12 +73,11 @@ final class Idna
     private static function mapCodePoints(string $domain, array $options, DomainInfo $info): string
     {
         $str = '';
-        $useSTD3ASCIIRules = $options['UseSTD3ASCIIRules'];
         $transitional = $options['Transitional_Processing'];
         $transitionalDifferent = false;
 
         foreach (CodePoint::utf8Decode($domain) as $codePoint) {
-            $data = CodePointStatus::lookup($codePoint, $useSTD3ASCIIRules);
+            $data = CodePointStatus::lookup($codePoint);
 
             switch ($data['status']) {
                 case 'disallowed':
@@ -161,7 +160,7 @@ final class Idna
         foreach ($labels as $i => $label) {
             $validationOptions = $options;
 
-            if (strncmp($label, 'xn--', 4) === 0) {
+            if (str_starts_with($label, 'xn--')) {
                 // Step 4.1. If the label contains any non-ASCII code point (i.e., a code point greater than U+007F),
                 // record that there was an error, and continue with the next label.
                 if (preg_match('/[^\x00-\x7F]/', $label) === 1) {
@@ -184,8 +183,22 @@ final class Idna
                     continue;
                 }
 
-                $validationOptions['Transitional_Processing'] = false;
                 $labels[$i] = $label;
+
+                // Step 4.3. If the label is empty, or if the label contains only ASCII code points, record that there
+                // was an error.
+                if ($label === '') {
+                    $info->addError(self::ERROR_EMPTY_LABEL);
+                }
+
+                if (preg_match('/[^\x00-\x7F]/', $label) === 0) {
+                    $info->addError(self::ERROR_INVALID_ACE_LABEL);
+                }
+
+                // Step 4.4. Verify that the label meets the validity criteria in Section 4.1, Validity Criteria for
+                // Nontransitional Processing. If any of the validity criteria are not satisfied, record that there was
+                // an error.
+                $validationOptions['Transitional_Processing'] = false;
             }
 
             $validator->validate($label, $validationOptions, $i > 0 && $i === $lastLabelIndex);
@@ -254,29 +267,23 @@ final class Idna
      */
     private static function validateDomainAndLabelLength(array $labels, DomainInfo $info): void
     {
-        $maxDomainSize = self::MAX_DOMAIN_SIZE;
-        $length = count($labels);
-        $totalLength = $length - 1;
+        $labelCount = count($labels);
 
-        // If the last label is empty and it is not the first label, then it is the root label.
-        // Increase the max size by 1, making it 254, to account for the root label's "."
-        // delimiter. This also means we don't need to check the last label's length for being too
-        // long.
-        if ($length > 1 && $labels[$length - 1] === '') {
-            ++$maxDomainSize;
-            --$length;
-        }
+        // Account for each label separator in the total length
+        $totalLength = $labelCount - 1;
 
-        for ($i = 0; $i < $length; ++$i) {
+        for ($i = 0; $i < $labelCount; ++$i) {
             $bytes = strlen($labels[$i]);
             $totalLength += $bytes;
 
-            if ($bytes > self::MAX_LABEL_SIZE) {
+            if ($bytes === 0) {
+                $info->addError(self::ERROR_EMPTY_LABEL);
+            } elseif ($bytes > self::MAX_LABEL_SIZE) {
                 $info->addError(self::ERROR_LABEL_TOO_LONG);
             }
         }
 
-        if ($totalLength > $maxDomainSize) {
+        if ($totalLength > self::MAX_DOMAIN_SIZE) {
             $info->addError(self::ERROR_DOMAIN_NAME_TOO_LONG);
         }
     }

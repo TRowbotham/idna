@@ -65,6 +65,7 @@ class IdnaV2Test extends IdnaV2TestCase
         string $toAsciiTStatus
     ): void {
         [
+            $source,
             $toUnicode,
             $toUnicodeStatus,
             $toAsciiN,
@@ -103,6 +104,7 @@ class IdnaV2Test extends IdnaV2TestCase
         string $toAsciiTStatus
     ): void {
         [
+            $source,
             $toUnicode,
             $toUnicodeStatus,
             $toAsciiN,
@@ -139,6 +141,7 @@ class IdnaV2Test extends IdnaV2TestCase
         string $toAsciiTStatus
     ): void {
         [
+            $source,
             $toUnicode,
             $toUnicodeStatus,
             $toAsciiN,

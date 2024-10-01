@@ -27,8 +27,6 @@ class IdnaDataBuilder extends Builder
             'ignored'                => [],
             'deviation'              => [],
             'disallowed'             => [],
-            'disallowed_STD3_mapped' => [],
-            'disallowed_STD3_valid'  => [],
         ];
         $rangeFallback = '';
 
@@ -50,7 +48,6 @@ class IdnaDataBuilder extends Builder
 
                 case 'mapped':
                 case 'deviation':
-                case 'disallowed_STD3_mapped':
                     if (preg_match_all('/[[:xdigit:]]+/', $data[2], $matches) === false) {
                         throw new RuntimeException();
                     }
@@ -89,7 +86,6 @@ RANGE_FALLBACK;
                     break;
 
                 case 'ignored':
-                case 'disallowed_STD3_valid':
                     for ($i = 0; $i < $diff; ++$i) {
                         $statuses[$status][$codePoints[0] + $i] = true;
                     }
@@ -103,8 +99,6 @@ RANGE_FALLBACK;
         file_put_contents($output . DS . 'ignored.php', "<?php\n\nreturn " . var_export($statuses['ignored'], true) . ";\n");
         file_put_contents($output . DS . 'deviation.php', "<?php\n\nreturn " . var_export($statuses['deviation'], true) . ";\n");
         file_put_contents($output . DS . 'disallowed.php', "<?php\n\nreturn " . var_export($statuses['disallowed'], true) . ";\n");
-        file_put_contents($output . DS . 'disallowed_STD3_mapped.php', "<?php\n\nreturn " . var_export($statuses['disallowed_STD3_mapped'], true) . ";\n");
-        file_put_contents($output . DS . 'disallowed_STD3_valid.php', "<?php\n\nreturn " . var_export($statuses['disallowed_STD3_valid'], true) . ";\n");
         $s = <<<CP_STATUS
 <?php
 

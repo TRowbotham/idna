@@ -36,10 +36,11 @@ class IdnaV2TestCase extends TestCase
         'V1' => Idna::ERROR_INVALID_ACE_LABEL,
         'V2' => Idna::ERROR_HYPHEN_3_4,
         'V3' => [Idna::ERROR_LEADING_HYPHEN, Idna::ERROR_TRAILING_HYPHEN],
-        'V4' => Idna::ERROR_LABEL_HAS_DOT,
-        'V5' => Idna::ERROR_LEADING_COMBINING_MARK,
-        'V6' => Idna::ERROR_DISALLOWED,
-        // V7 and V8 are handled by C* and B* respectively.
+        'V4' => Idna::ERROR_PUNYCODE,
+        'V5' => Idna::ERROR_LABEL_HAS_DOT,
+        'V6' => Idna::ERROR_LEADING_COMBINING_MARK,
+        'V7' => Idna::ERROR_DISALLOWED,
+        // V8 and V9 are handled by C* and B* respectively.
         'A3' => Idna::ERROR_PUNYCODE,
         'A4_1' => Idna::ERROR_DOMAIN_NAME_TOO_LONG,
         'A4_2' => [Idna::ERROR_EMPTY_LABEL, Idna::ERROR_LABEL_TOO_LONG],
@@ -61,6 +62,7 @@ class IdnaV2TestCase extends TestCase
         // 'C9' => Idna::ERROR_CONTEXTO_DIGITS,
         'X4_2' => Idna::ERROR_EMPTY_LABEL,
         'X3' => Idna::ERROR_EMPTY_LABEL,
+        'U1' => Idna::ERROR_DISALLOWED,
     ];
 
     private const BASE_URI = 'https://www.unicode.org/Public/idna/';
@@ -152,7 +154,7 @@ class IdnaV2TestCase extends TestCase
         $errors = [];
 
         foreach ($matches[0] as $match) {
-            if ($match[0] === 'U' || in_array($match, $ignore, true)) {
+            if (in_array($match, $ignore, true)) {
                 continue;
             }
 
@@ -186,23 +188,34 @@ class IdnaV2TestCase extends TestCase
         string $toAsciiTStatus,
         array $ignore = []
     ): array {
-        if ($toUnicode === '') {
-            $toUnicode = $source;
+        if ($source === '""') {
+            $source = '';
         }
 
-        if ($toAsciiN === '') {
-            $toAsciiN = $toUnicode;
-        }
+        $toUnicode = match ($toUnicode) {
+            '""' => '',
+            '' => $source,
+            default => $toUnicode,
+        };
 
-        if ($toAsciiT === '') {
-            $toAsciiT = $toAsciiN;
-        }
+        $toAsciiN = match ($toAsciiN) {
+            '""' => '',
+            '' => $toUnicode,
+            default => $toAsciiN,
+        };
+
+        $toAsciiT = match ($toAsciiT) {
+            '""' => '',
+            '' => $toAsciiN,
+            default => $toAsciiT,
+        };
 
         $toUnicodeStatus = $this->resolveErrorCodes($toUnicodeStatus, [], $ignore);
         $toAsciiNStatus = $this->resolveErrorCodes($toAsciiNStatus, $toUnicodeStatus, $ignore);
         $toAsciiTStatus = $this->resolveErrorCodes($toAsciiTStatus, $toAsciiNStatus, $ignore);
 
         return [
+            $source,
             $toUnicode,
             $toUnicodeStatus,
             $toAsciiN,
