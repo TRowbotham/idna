@@ -8,7 +8,7 @@
 
 ### Changed
 
-* Update data files to Unicode 15.1.0
+* Update data files to Unicode 16.0.0
 * Setting `Transitional_Processing` to `true` now emits a deprecation notice.
 * Bumped minimum PHP version to 8.1
 
