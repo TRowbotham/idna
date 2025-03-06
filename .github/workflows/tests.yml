@@ -15,12 +15,10 @@ jobs:
       fail-fast: false
       matrix:
         php-version:
-          - 7.1
-          - 7.2
-          - 7.3
-          - 7.4
-          - 8.0
           - 8.1
+          - 8.2
+          - 8.3
+          - 8.4
         operating-system: [ ubuntu-latest ]
 
     steps:
@@ -74,12 +72,10 @@ jobs:
       fail-fast: false
       matrix:
         php-version:
-          - 7.1
-          - 7.2
-          - 7.3
-          - 7.4
-          - 8.0
           - 8.1
+          - 8.2
+          - 8.3
+          - 8.4
         operating-system: [ ubuntu-latest ]
 
     steps:
@@ -185,7 +181,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: 8.1
           extensions: :intl
           coverage: pcov
 
@@ -231,7 +227,7 @@ jobs:
       fail-fast: false
       matrix:
         php-version:
-          - 8.0
+          - 8.1
         operating-system: [ ubuntu-latest ]
 
     steps:
