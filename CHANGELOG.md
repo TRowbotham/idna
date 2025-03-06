@@ -11,6 +11,7 @@
 * Update data files to Unicode 16.0.0
 * Setting `Transitional_Processing` to `true` now emits a deprecation notice.
 * Bumped minimum PHP version to 8.1
+* Bumped `phpstan/phpstan` to `^2.1`
 
 ## [0.1.5] - 2022-01-10
 
