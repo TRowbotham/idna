@@ -45,15 +45,19 @@ final class CodePointStatus
     }
 
     /**
-     * @return array{status: string, mapping?: string}
+     * @return array{status: 'valid'|'ignored'|'disallowed' }|array{ status: 'mapped'|'deviation', mapping: string }
      */
     public static function lookup(int $codePoint): array
     {
         if (!self::$dataLoaded) {
             self::$dataLoaded = true;
+            /** @phpstan-ignore assign.propertyType */
             self::$mapped = require self::RESOURCE_DIR . 'mapped.php';
+            /** @phpstan-ignore assign.propertyType */
             self::$ignored = require self::RESOURCE_DIR . 'ignored.php';
+            /** @phpstan-ignore assign.propertyType */
             self::$deviation = require self::RESOURCE_DIR . 'deviation.php';
+            /** @phpstan-ignore assign.propertyType */
             self::$disallowed = require self::RESOURCE_DIR . 'disallowed.php';
         }
 

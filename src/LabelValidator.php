@@ -34,6 +34,7 @@ class LabelValidator
         $this->info = $info;
 
         if (self::$virama === []) {
+            /** @phpstan-ignore assign.propertyType */
             self::$virama = require __DIR__ . DS . '..' . DS . 'resources' . DS . 'virama.php';
         }
     }

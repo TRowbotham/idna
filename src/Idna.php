@@ -8,7 +8,9 @@ use Normalizer;
 use Rowbot\Punycode\Exception\PunycodeException;
 use Rowbot\Punycode\Punycode;
 
+use function array_is_list;
 use function array_merge;
+use function assert;
 use function count;
 use function explode;
 use function implode;
@@ -152,6 +154,7 @@ final class Idna
         }
 
         // Step 3. Break the string into labels at U+002E (.) FULL STOP.
+        /** @phpstan-ignore argument.type */
         $labels = explode('.', $domain);
         $lastLabelIndex = count($labels) - 1;
         $validator = new LabelValidator($info);
@@ -208,6 +211,8 @@ final class Idna
             $info->addError(self::ERROR_BIDI);
         }
 
+        assert(array_is_list($labels));
+
         // Any input domain name string that does not record an error has been successfully
         // processed according to this specification. Conversely, if an input domain_name string
         // causes an error, then the processing of the input domain_name string fails. Determining
@@ -238,6 +243,8 @@ final class Idna
                 $labels[$i] = $label;
             }
         }
+
+        assert(array_is_list($labels));
 
         if ($options['VerifyDnsLength']) {
             self::validateDomainAndLabelLength($labels, $info);

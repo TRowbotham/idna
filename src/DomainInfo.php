@@ -25,11 +25,18 @@ class DomainInfo
         $this->validBidiDomain = true;
     }
 
+    /**
+     * @param int-mask-of<\Rowbot\Idna\Idna::ERROR_*> $errors
+     */
     public function addError(int $errors): void
     {
+        /** @phpstan-ignore assign.propertyType */
         $this->errors |= $errors;
     }
 
+    /**
+     * @return int-mask-of<\Rowbot\Idna\Idna::ERROR_*>
+     */
     public function getErrors(): int
     {
         return $this->errors;
