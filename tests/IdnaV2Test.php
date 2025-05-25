@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Rowbot\Idna\Test;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionClass;
 use Rowbot\Idna\Idna;
 
@@ -52,9 +53,7 @@ class IdnaV2Test extends IdnaV2TestCase
         return self::loadTestData(Idna::UNICODE_VERSION);
     }
 
-    /**
-     * @dataProvider getData
-     */
+    #[DataProvider('getData')]
     public function testToUnicode(
         string $source,
         string $toUnicode,
@@ -91,9 +90,7 @@ class IdnaV2Test extends IdnaV2TestCase
         }
     }
 
-    /**
-     * @dataProvider getData
-     */
+    #[DataProvider('getData')]
     public function testToAsciiNonTransitional(
         string $source,
         string $toUnicode,
@@ -128,9 +125,7 @@ class IdnaV2Test extends IdnaV2TestCase
         }
     }
 
-    /**
-     * @dataProvider getData
-     */
+    #[DataProvider('getData')]
     public function testToAsciiTransitional(
         string $source,
         string $toUnicode,
