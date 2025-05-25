@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php }} ${{ matrix.php-jit == 'on' && 'with' || 'without' }} JIT on ${{ matrix.os }}
+    name: PHP ${{ matrix.php }} ${{ matrix.php-jit == 'on' && 'with' || 'without' }} JIT, Intl ext ${{ matrix.intl-ext == 'intl' && 'enabled' || 'disabled' }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.php == 'nightly' }}
 
@@ -42,6 +42,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: ${{ matrix.intl-ext }}
+          ini-values: zend.assertions=1, opcache.enable_cli=1, opcache.memory_consumption=256, opcache.jit=${{ matrix.php-jit == 'on' && 1255 || 'disable' }}, opcache.jit_buffer_size=${{ matrix.php-jit == 'on' && '256M' || '0' }}
           coverage: none
 
       - name: Get composer cache directory
@@ -65,7 +66,12 @@ jobs:
           restore-keys: unicode-test-data-
 
       - name: Install dependencies
-        run: composer install
+        run: |
+          if [[ ${{ matrix.php == 'nightly' }} ]]; then
+            composer update --no-interaction --ignore-platform-reqs
+          else
+            composer update --no-interaction
+          fi
 
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse
