@@ -1,7 +1,7 @@
 # IDNA
 
 [![License](https://img.shields.io/github/license/TRowbotham/idna?style=flat-square)](https://github.com/TRowbotham/idna/blob/master/LICENSE)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/TRowbotham/idna/Tests?style=flat-square)](https://img.shields.io/github/workflow/status/TRowbotham/idna/actions)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/TRowbotham/idna/tests.yml?branch=master&style=flat-square)](https://img.shields.io/github/workflow/status/TRowbotham/idna/actions)
 [![Code Coverage](https://img.shields.io/codecov/c/github/TRowbotham/idna/master?style=flat-square)](https://codecov.io/gh/TRowbotham/idna)
 [![Version](https://img.shields.io/packagist/v/rowbot/idna?style=flat-square)](https://packagist.org/packages/rowbot/idna)
 [![Downloads](https://img.shields.io/packagist/dt/rowbot/idna?style=flat-square)](https://packagist.org/packages/rowbot/idna)
@@ -11,7 +11,7 @@ as Unicode IDNA Compatibility Processing. You can read more about the difference
 IDNA2008, and UTS#46 in [Section 7. IDNA Comparison](https://www.unicode.org/reports/tr46/#IDNAComparison)
 of the specification.
 
-This library currently ships with Unicode 15.1.0 support and implements Version 15.1.0, Revision 31 of IDNA Compatibility
+This library currently ships with Unicode 16.0.0 support and implements Version 16.0.0, Revision 31 of IDNA Compatibility
 Processing.
 
 * [Requirements](#requirements)
@@ -24,7 +24,7 @@ Processing.
 
 ## Requirements
 
-* PHP 7.1+
+* PHP 8.1+
 * `rowbot/punycode`
 * `symfony/polyfill-intl-normalizer`
 
@@ -322,7 +322,7 @@ inside in invalid domains, but your implementation doesn't?**
 ### Building
 
 Unicode data files are fetched from https://www.unicode.org/Public. Currently, Unicode version
-15.1.0-15.1.0 are supported. To change the version of Unicode that the library is built with, you
+16.0.0-16.0.0 are supported. To change the version of Unicode that the library is built with, you
 must first change the value of the `\Rowbot\Idna::UNICODE_VERSION` constant, like so:
 
 ```diff
