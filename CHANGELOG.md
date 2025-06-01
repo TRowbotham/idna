@@ -5,6 +5,7 @@
 ### Added
 
 * New option `IgnoreInvalidPunycode` that when set to `true` enables an ASCII fast-path.
+* Now requires `mbstring` extension
 
 ### Changed
 

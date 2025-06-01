@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Rowbot\Idna;
 
 use function chr;
+use function mb_str_split;
+use function mb_ord;
 use function ord;
-use function strlen;
+use function unpack;
 
 final class CodePoint
 {
@@ -53,31 +55,39 @@ final class CodePoint
     public static function utf8Decode(string $input): array
     {
         $codePoints = [];
-        $shifts = [
-            ['byte' => [], 'shifts' => []],
-            ['byte' => [0xC0], 'shifts' => [6]],
-            ['byte' => [0xE0, 0x80], 'shifts' => [12, 6]],
-            ['byte' => [0xF0, 0x80, 0x80], 'shifts' => [18, 12, 6]],
-        ];
 
         foreach (mb_str_split($input, 1, 'utf-8') as $s) {
-            $bytes = strlen($s);
+            // First, try the common case of a valid UTF-8 codepoint. mb_ord() will return false if the code point is
+            // not valid such as an unpaired surrogate.
+            $code = mb_ord($s, 'utf-8');
 
-            if ($bytes === 1) {
-                $codePoints[] = ord($s);
+            if ($code !== false) {
+                $codePoints[] = $code;
 
                 continue;
             }
 
-            $bytesLength = $bytes - 1;
-            $x = 0;
+            // Next, check if the code point was an unpaired surrogate as we still want to pass them through and
+            // mb_str_split() will give us the unpaired surrogate despite mb_ord() returning false for it.
+            if ($s >= "\u{D800}" && $s <= "\u{DB7F}" || $s >= "\u{DC00}" && $s <= "\u{DFFF}") {
+                /** @var array<int>|false $code */
+                $code = unpack('C*', $s);
 
-            for ($i = 0; $i < $bytesLength; ++$i) {
-                $x += (ord($s[$i]) - $shifts[$bytesLength]['byte'][$i]) << $shifts[$bytesLength]['shifts'][$i];
+                if ($code === false) {
+                    // Is outputing a replacement character the right thing to do here? Should we throw instead, even
+                    // though  nothing else throws?
+                    $codePoints[] = 0xFFFD;
+
+                    continue;
+                }
+
+                $codePoints[] = (($code[1] - 0xE0) << 12) + (($code[2] - 0x80) << 6) + $code[3] - 0x80;
+
+                continue;
             }
 
-            $x += ord($s[$bytesLength]) - 0x80;
-            $codePoints[] = $x;
+            // Lastly, no codepoint could be formed and mb_str_split() should be returning individual bytes.
+            $codePoints[] = ord($s);
         }
 
         return $codePoints;
