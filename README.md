@@ -25,6 +25,7 @@ Processing.
 ## Requirements
 
 * PHP 8.1+
+* `ext-mbstring`
 * `rowbot/punycode`
 * `symfony/polyfill-intl-normalizer`
 
