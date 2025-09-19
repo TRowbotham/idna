@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.0] - 2025-09-18
+
+### Changed
+
+* Update data files to Unicode 17.0.0
+
 ## [0.2.0] - 2025-06-01
 
 ### Added
