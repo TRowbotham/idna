@@ -24,7 +24,11 @@ abstract class Builder
      */
     protected static function getIdnaDataResource(string $file)
     {
-        $file = sprintf('%s/idna/%s/%s', self::BASE_URL, Idna::UNICODE_VERSION, $file);
+        $format = match (Idna::UNICODE_VERSION) {
+            '16.0.0' => '%s/idna/%s/%s', // @phpstan-ignore match.alwaysFalse
+            default  => '%s/%s/idna/%s',
+        };
+        $file = sprintf($format, self::BASE_URL, Idna::UNICODE_VERSION, $file);
         $handle = fopen($file, 'r');
 
         if ($handle === false) {

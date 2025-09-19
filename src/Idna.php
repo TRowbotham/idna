@@ -25,7 +25,7 @@ use const E_USER_DEPRECATED;
  */
 final class Idna
 {
-    public const UNICODE_VERSION = '16.0.0';
+    public const UNICODE_VERSION = '17.0.0';
 
     private const DEFAULT_UNICODE_OPTIONS = [
         'CheckHyphens'            => true,

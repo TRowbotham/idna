@@ -11,7 +11,7 @@ as Unicode IDNA Compatibility Processing. You can read more about the difference
 IDNA2008, and UTS#46 in [Section 7. IDNA Comparison](https://www.unicode.org/reports/tr46/#IDNAComparison)
 of the specification.
 
-This library currently ships with Unicode 16.0.0 support and implements Version 16.0.0, Revision 31 of IDNA Compatibility
+This library currently ships with Unicode 17.0.0 support and implements Version 17.0.0, Revision 35 of IDNA Compatibility
 Processing.
 
 * [Requirements](#requirements)
@@ -323,7 +323,7 @@ inside in invalid domains, but your implementation doesn't?**
 ### Building
 
 Unicode data files are fetched from https://www.unicode.org/Public. Currently, Unicode version
-16.0.0-16.0.0 are supported. To change the version of Unicode that the library is built with, you
+16.0.0-17.0.0 are supported. To change the version of Unicode that the library is built with, you
 must first change the value of the `\Rowbot\Idna::UNICODE_VERSION` constant, like so:
 
 ```diff

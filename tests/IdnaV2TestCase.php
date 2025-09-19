@@ -65,7 +65,7 @@ class IdnaV2TestCase extends TestCase
         'U1' => Idna::ERROR_DISALLOWED,
     ];
 
-    private const BASE_URI = 'https://www.unicode.org/Public/idna/';
+    private const BASE_URI = 'https://www.unicode.org/Public/';
     private const TEST_FILE = 'IdnaTestV2.txt';
     private const CACHE_TTL = 86400 * 7; // 7 DAYS
     private const TEST_DATA_DIR = __DIR__ . DIRECTORY_SEPARATOR . 'data';
@@ -83,10 +83,13 @@ class IdnaV2TestCase extends TestCase
 
         return $cache->get($version, static function () use ($version): array {
             $client = new Client([
-                'base_uri' => self::BASE_URI,
+                'base_uri' => match ($version) {
+                    '16.0.0' => self::BASE_URI . 'idna/' . $version . '/',
+                    default  => self::BASE_URI . $version . '/idna/',
+                },
                 'http_errors' => true,
             ]);
-            $response = $client->get($version . '/' . self::TEST_FILE);
+            $response = $client->get(self::TEST_FILE);
 
             return self::processResponse($response);
         });
