@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.0] - 2026-10-09
+
+### Changed
+
+* Update data files to Unicode 18.0.0
+
 ## [0.3.0] - 2025-09-18
 
 ### Changed
