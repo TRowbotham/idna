@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Rowbot\Idna;
 
+use function assert;
 use function chr;
 use function mb_str_split;
 use function mb_ord;
@@ -38,7 +39,9 @@ final class CodePoint
             $offset = 0xF0;
         }
 
-        $bytes = chr(($codePoint >> (6 * $count)) + $offset);
+        $cp = ($codePoint >> (6 * $count)) + $offset;
+        assert($cp >= 0 && $cp <= 255);
+        $bytes = chr($cp);
 
         while ($count > 0) {
             $temp = $codePoint >> (6 * ($count - 1));
