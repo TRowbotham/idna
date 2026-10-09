@@ -24,10 +24,6 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 11870 && $codePoint <= 11903) {
-            return true;
-        }
-
         if ($codePoint >= 55296 && $codePoint <= 57343) {
             return true;
         }
@@ -60,7 +56,7 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 67515 && $codePoint <= 67583) {
+        if ($codePoint >= 67520 && $codePoint <= 67583) {
             return true;
         }
 
@@ -85,10 +81,6 @@ final class DisallowedRanges
         }
 
         if ($codePoint >= 69008 && $codePoint <= 69215) {
-            return true;
-        }
-
-        if ($codePoint >= 69337 && $codePoint <= 69369) {
             return true;
         }
 
@@ -120,7 +112,7 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 72458 && $codePoint <= 72543) {
+        if ($codePoint >= 72459 && $codePoint <= 72543) {
             return true;
         }
 
@@ -132,7 +124,7 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 73194 && $codePoint <= 73439) {
+        if ($codePoint >= 73202 && $codePoint <= 73439) {
             return true;
         }
 
@@ -144,7 +136,7 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 75076 && $codePoint <= 77711) {
+        if ($codePoint >= 75399 && $codePoint <= 77711) {
             return true;
         }
 
@@ -172,15 +164,15 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 101590 && $codePoint <= 101630) {
+        if ($codePoint >= 101595 && $codePoint <= 101630) {
             return true;
         }
 
-        if ($codePoint >= 101663 && $codePoint <= 101759) {
+        if ($codePoint >= 101665 && $codePoint <= 101759) {
             return true;
         }
 
-        if ($codePoint >= 101875 && $codePoint <= 110575) {
+        if ($codePoint >= 102867 && $codePoint <= 110575) {
             return true;
         }
 
@@ -196,7 +188,7 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 119366 && $codePoint <= 119487) {
+        if ($codePoint >= 119426 && $codePoint <= 119487) {
             return true;
         }
 
@@ -204,11 +196,15 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 121520 && $codePoint <= 122623) {
+        if ($codePoint >= 121520 && $codePoint <= 121599) {
             return true;
         }
 
-        if ($codePoint >= 122667 && $codePoint <= 122879) {
+        if ($codePoint >= 121629 && $codePoint <= 122623) {
+            return true;
+        }
+
+        if ($codePoint >= 122775 && $codePoint <= 122828) {
             return true;
         }
 
@@ -264,7 +260,7 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 127406 && $codePoint <= 127461) {
+        if ($codePoint >= 127407 && $codePoint <= 127461) {
             return true;
         }
 
@@ -292,7 +288,11 @@ final class DisallowedRanges
             return true;
         }
 
-        if ($codePoint >= 210042 && $codePoint <= 262141) {
+        if ($codePoint >= 210042 && $codePoint <= 249855) {
+            return true;
+        }
+
+        if ($codePoint >= 261184 && $codePoint <= 262141) {
             return true;
         }
 
