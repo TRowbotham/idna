@@ -30,7 +30,6 @@ class DomainInfo
      */
     public function addError(int $errors): void
     {
-        /** @phpstan-ignore assign.propertyType */
         $this->errors |= $errors;
     }
 
